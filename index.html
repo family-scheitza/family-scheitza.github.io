@@ -1023,11 +1023,11 @@ const ONESIGNAL_APP_ID = "f32f009b-7215-4ab0-ac82-e6781cec15ae";
 // (looks like "https://familien-hub-push.YOURNAME.workers.dev"). Leave
 // empty to disable outbound push — everything else keeps working, you just
 // won't get notifications while the app is fully closed.
-const PUSH_PROXY_URL = "";
+const PUSH_PROXY_URL = "https://family-hub-push.frederick-schroedenberg.workers.dev/";
 // A password only your app and your Worker know, so a stranger who guesses
 // the Worker URL can't use it to spam your family with pushes. Make up any
 // string, put the SAME string in the Worker's PROXY_SHARED_SECRET variable.
-const PUSH_PROXY_SECRET = "";
+const PUSH_PROXY_SECRET = "family.scheitza";
 
 // ---------- 1. YOUR FIREBASE CONFIG (see SETUP.md) ----------
 const firebaseConfig = {
