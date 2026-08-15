@@ -1,0 +1,12 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Message attachments (images & documents). Same trust model as
+    // Firestore: anyone signed in (anonymously, via the app) can read
+    // and upload. Keep uploads reasonably small.
+    match /attachments/{conversationId}/{fileName} {
+      allow read, write: if request.auth != null
+                          && request.resource.size < 25 * 1024 * 1024; // 25 MB max per file
+    }
+  }
+}
