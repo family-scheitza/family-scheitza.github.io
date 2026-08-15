@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Family Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root[data-theme="dark"]{
+    --bg:#0A1830;
+    --bg-2:#0F2247;
+    --surface:#122852;
+    --surface-2:#173066;
+    --text:#F3EEE1;
+    --text-dim:#AEBBD4;
+    --divider:rgba(201,162,75,.22);
+    --shadow: 0 18px 50px rgba(0,0,0,.45);
+    --overlay: rgba(6,13,28,.72);
+  }
+  :root[data-theme="light"]{
+    --bg:#F7F4EC;
+    --bg-2:#FFFFFF;
+    --surface:#FFFFFF;
+    --surface-2:#FBF8F0;
+    --text:#101B33;
+    --text-dim:#5A6684;
+    --divider:rgba(11,31,58,.14);
+    --shadow: 0 18px 40px rgba(16,27,51,.10);
+    --overlay: rgba(16,27,51,.35);
+  }
+  :root{
+    --accent:#C9A24B;
+    --accent-soft:#E4CD8E;
+    --navy:#0A1830;
+    --gold:#C9A24B;
+    --danger:#B5533C;
+    --good:#4F8C6A;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    transition:background .4s ease, color .4s ease;
+  }
+  h1,h2,h3,.display{
+    font-family:'Playfair Display',serif;
+    letter-spacing:.2px;
+  }
+  .hidden{display:none !important;}
+  button{font-family:inherit;cursor:pointer;}
+  input,select,textarea{font-family:inherit;}
+  ::selection{background:var(--accent-soft); color:#111;}
+
+  /* ---------- Ornamental rule ---------- */
+  .rule{
+    height:1px;
+    background:linear-gradient(90deg, transparent, var(--accent) 20%, var(--accent) 80%, transparent);
+    opacity:.55;
+    margin:18px 0;
+  }
+
+  /* ---------- LOGIN SCREEN ---------- */
+  #login-screen{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:40px 20px;
+    background:
+      radial-gradient(ellipse at 50% -10%, rgba(201,162,75,.18), transparent 55%),
+      var(--bg);
+  }
+  .brand{
+    text-align:center;
+    margin-bottom:44px;
+  }
+  .brand .crest-mark{
+    width:52px;height:52px;margin:0 auto 18px;
+    border:1.5px solid var(--gold);
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .brand .crest-mark:before{
+    content:"";
+    position:absolute; inset:6px;
+    border:1px solid var(--gold);
+    border-radius:50%;
+    opacity:.5;
+  }
+  .brand .crest-mark span{
+    font-family:'Playfair Display',serif;
+    color:var(--gold);
+    font-size:20px;
+  }
+  .brand h1{
+    font-size:2.4rem;
+    margin:0 0 6px;
+    font-weight:600;
+    color:var(--text);
+  }
+  .brand p{
+    margin:0;
+    color:var(--text-dim);
+    letter-spacing:2.5px;
+    text-transform:uppercase;
+    font-size:.72rem;
+  }
+  .crest-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:26px;
+    justify-content:center;
+    max-width:820px;
+  }
+  .crest{
+    width:150px;
+    background:var(--surface);
+    border:1px solid var(--divider);
+    border-radius:var(--radius);
+    padding:26px 14px 20px;
+    text-align:center;
+    box-shadow:var(--shadow);
+    cursor:pointer;
+    transition:transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+    position:relative;
+  }
+  .crest:hover{
+    transform:translateY(-6px);
+    border-color:var(--gold);
+  }
+  .crest .shield{
+    width:64px;height:74px;
+    margin:0 auto 14px;
+    background:linear-gradient(160deg, var(--surface-2), var(--surface));
+    border:1.5px solid var(--gold);
+    clip-path:polygon(50% 0%, 100% 18%, 100% 62%, 50% 100%, 0% 62%, 0% 18%);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Playfair Display',serif;
+    font-size:1.6rem;
+    color:var(--gold);
+  }
+  .crest .name{
+    font-weight:600;
+    font-size:1rem;
+    margin-bottom:2px;
+  }
+  .crest .role{
+    font-size:.68rem;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--text-dim);
+  }
+
+  /* password modal */
+  .modal-backdrop{
+    position:fixed; inset:0;
+    background:var(--overlay);
+    display:flex;align-items:center;justify-content:center;
+    z-index:50;
+    padding:20px;
+  }
+  .modal{
+    background:var(--surface);
+    border:1px solid var(--divider);
+    border-radius:var(--radius);
+    padding:32px;
+    width:100%;
+    max-width:360px;
+    box-shadow:var(--shadow);
+    text-align:center;
+  }
+  .modal h3{margin:6px 0 4px;}
+  .modal p{color:var(--text-dim); font-size:.85rem; margin:0 0 20px;}
+  .field{
+    text-align:left;
+    margin-bottom:14px;
+  }
+  .field label{
+    display:block;
+    font-size:.72rem;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    margin-bottom:6px;
+  }
+  .field input, .field select{
+    width:100%;
+    background:var(--bg-2);
+    border:1px solid var(--divider);
+    border-radius:10px;
+    padding:11px 13px;
+    color:var(--text);
+    font-size:.95rem;
+    outline:none;
+    transition:border-color .2s;
+  }
+  .field input:focus, .field select:focus{border-color:var(--gold);}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 22px;
+    border-radius:10px;
+    border:1px solid var(--gold);
+    background:var(--gold);
+    color:#1B1305;
+    font-weight:600;
+    font-size:.88rem;
+    transition:filter .2s, transform .15s;
+  }
+  .btn:hover{filter:brightness(1.08);}
+  .btn:active{transform:scale(.97);}
+  .btn-ghost{
+    background:transparent;
+    color:var(--text);
+    border:1px solid var(--divider);
+  }
+  .btn-ghost:hover{border-color:var(--gold);}
+  .btn-danger{border-color:var(--danger); background:transparent; color:var(--danger);}
+  .btn-full{width:100%;}
+  .btn-row{display:flex; gap:10px; margin-top:18px;}
+  .error-text{color:var(--danger); font-size:.82rem; min-height:18px; margin-top:2px;}
+
+  /* ---------- APP SHELL ---------- */
+  #app{min-height:100vh; display:none;}
+  #app.active{display:block;}
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 28px;
+    border-bottom:1px solid var(--divider);
+    background:var(--bg-2);
+    position:sticky; top:0; z-index:20;
+  }
+  .topbar .who{display:flex; align-items:center; gap:12px;}
+  .avatar-sm{
+    width:38px;height:38px;border-radius:50%;
+    background:linear-gradient(160deg, var(--surface-2), var(--surface));
+    border:1.5px solid var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Playfair Display',serif; color:var(--gold); font-size:.95rem;
+  }
+  .topbar .who h2{margin:0; font-size:1.05rem; font-weight:600;}
+  .topbar .who span{font-size:.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px;}
+  .top-actions{display:flex; align-items:center; gap:10px;}
+  .icon-btn{
+    width:38px;height:38px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:transparent; border:1px solid var(--divider); color:var(--text);
+    transition:border-color .2s, color .2s;
+  }
+  .icon-btn:hover{border-color:var(--gold); color:var(--gold);}
+
+  .tabs{
+    display:flex; gap:6px;
+    padding:12px 28px 0;
+    background:var(--bg-2);
+    border-bottom:1px solid var(--divider);
+    overflow-x:auto;
+  }
+  .tab-btn{
+    background:transparent; border:none; color:var(--text-dim);
+    padding:10px 16px; font-size:.86rem; font-weight:600;
+    border-bottom:2px solid transparent;
+    white-space:nowrap;
+  }
+  .tab-btn.active{color:var(--gold); border-bottom-color:var(--gold);}
+
+  main{max-width:1000px; margin:0 auto; padding:32px 24px 80px;}
+  .panel{display:none;}
+  .panel.active{display:block; animation:fade .35s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--divider);
+    border-radius:var(--radius);
+    padding:22px 24px;
+    box-shadow:var(--shadow);
+  }
+  .grid-2{display:grid; grid-template-columns:1.3fr 1fr; gap:20px;}
+  @media (max-width:760px){ .grid-2{grid-template-columns:1fr;} }
+
+  /* HOME */
+  .home-greeting{margin-bottom:24px;}
+  .home-greeting h1{font-size:1.9rem; margin:0 0 4px;}
+  .home-greeting p{color:var(--text-dim); margin:0;}
+  .stat-row{display:flex; gap:16px; flex-wrap:wrap; margin-top:20px;}
+  .stat{
+    flex:1; min-width:150px;
+    background:var(--surface); border:1px solid var(--divider); border-radius:14px;
+    padding:16px 18px;
+  }
+  .stat .num{font-family:'Playfair Display',serif; font-size:1.8rem; color:var(--gold);}
+  .stat .lbl{font-size:.75rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px;}
+
+  /* CALENDAR */
+  .cal-header{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;}
+  .cal-header h2{margin:0; font-size:1.3rem;}
+  .cal-nav{display:flex; gap:8px;}
+  .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px;}
+  .cal-dow{text-align:center; font-size:.68rem; letter-spacing:1px; text-transform:uppercase; color:var(--text-dim); padding-bottom:6px;}
+  .cal-day{
+    min-height:64px;
+    border:1px solid var(--divider);
+    border-radius:10px;
+    padding:6px 8px;
+    font-size:.82rem;
+    cursor:pointer;
+    position:relative;
+    transition:border-color .2s, background .2s;
+  }
+  .cal-day:hover{border-color:var(--gold);}
+  .cal-day.empty{visibility:hidden;}
+  .cal-day.today{border-color:var(--gold); box-shadow:inset 0 0 0 1px var(--gold);}
+  .cal-day.selected{background:var(--surface-2);}
+  .cal-dot{
+    width:6px;height:6px;border-radius:50%;background:var(--gold);
+    position:absolute; bottom:6px; left:8px;
+  }
+  .event-item{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    padding:12px 0; border-bottom:1px solid var(--divider); gap:10px;
+  }
+  .event-item:last-child{border-bottom:none;}
+  .event-item .t{font-weight:600; font-size:.9rem;}
+  .event-item .d{font-size:.8rem; color:var(--text-dim); margin-top:2px;}
+  .event-item .who{font-size:.68rem; color:var(--gold); margin-top:4px; text-transform:uppercase; letter-spacing:.5px;}
+  .chip{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 12px; border-radius:20px;
+    border:1px solid var(--divider);
+    font-size:.78rem;
+    cursor:pointer; user-select:none;
+    background:var(--bg-2);
+  }
+  .chip.on{border-color:var(--gold); color:var(--gold); background:rgba(201,162,75,.1);}
+  .chip-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:6px;}
+  .x-btn{background:none; border:none; color:var(--text-dim); font-size:1rem; line-height:1;}
+  .x-btn:hover{color:var(--danger);}
+
+  /* LISTS */
+  .lists-layout{display:grid; grid-template-columns:230px 1fr; gap:20px;}
+  @media (max-width:700px){ .lists-layout{grid-template-columns:1fr;} }
+  .list-nav-item{
+    padding:12px 14px; border-radius:10px; cursor:pointer;
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:.9rem; margin-bottom:6px;
+    border:1px solid transparent;
+  }
+  .list-nav-item:hover{border-color:var(--divider);}
+  .list-nav-item.active{background:var(--surface-2); border-color:var(--gold); color:var(--gold); font-weight:600;}
+  .list-item{
+    display:flex; align-items:center; gap:12px;
+    padding:12px 4px; border-bottom:1px solid var(--divider);
+  }
+  .list-item:last-child{border-bottom:none;}
+  .check{
+    width:22px; height:22px; border-radius:50%;
+    border:1.5px solid var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; cursor:pointer; font-size:.8rem; color:var(--gold);
+  }
+  .check.done{background:var(--gold); color:#1B1305;}
+  .list-item .txt{flex:1; font-size:.92rem;}
+  .list-item.done .txt{text-decoration:line-through; color:var(--text-dim);}
+
+  /* MOOD */
+  .mood-gauge{
+    background:var(--surface); border:1px solid var(--divider); border-radius:16px;
+    padding:22px; text-align:center;
+  }
+  .mood-gauge .who{font-weight:600; margin-bottom:14px;}
+  .mood-emoji{font-size:2.4rem; margin-bottom:6px;}
+  .mood-label{color:var(--gold); font-size:.85rem; text-transform:uppercase; letter-spacing:1px; margin-bottom:14px;}
+  input[type="range"]{
+    width:100%; accent-color:var(--gold);
+  }
+  .mood-scale-lbls{display:flex; justify-content:space-between; font-size:.68rem; color:var(--text-dim); margin-top:4px;}
+
+  /* SETTINGS */
+  .swatch-row{display:flex; gap:10px; flex-wrap:wrap; margin:10px 0 4px;}
+  .swatch{
+    width:34px;height:34px;border-radius:50%;
+    border:2px solid transparent;
+    cursor:pointer;
+  }
+  .swatch.active{border-color:var(--text);}
+  .toggle-row{display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--divider);}
+  .toggle-row:last-child{border-bottom:none;}
+  .switch{
+    width:46px; height:26px; border-radius:14px; background:var(--divider);
+    position:relative; cursor:pointer; transition:background .2s;
+  }
+  .switch.on{background:var(--gold);}
+  .switch:before{
+    content:""; position:absolute; top:3px; left:3px;
+    width:20px; height:20px; border-radius:50%; background:var(--bg-2);
+    transition:left .2s;
+  }
+  .switch.on:before{left:23px;}
+
+  .empty-state{
+    text-align:center; padding:40px 20px; color:var(--text-dim);
+  }
+  .empty-state .glyph{font-size:1.8rem; color:var(--gold); margin-bottom:8px;}
+
+  .section-title{
+    font-size:.72rem; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--text-dim); margin:0 0 14px;
+  }
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    background:var(--surface); border:1px solid var(--gold); color:var(--text);
+    padding:12px 20px; border-radius:10px; box-shadow:var(--shadow);
+    font-size:.85rem; z-index:100; opacity:0; pointer-events:none;
+    transition:opacity .25s, transform .25s;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(-6px);}
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="login-screen">
+  <div class="brand">
+    <div class="crest-mark"><span>F</span></div>
+    <h1>Family Hub</h1>
+    <p>Private &middot; Shared &middot; Golden</p>
+  </div>
+  <div class="crest-grid" id="crest-grid"></div>
+</div>
+
+<div id="password-modal" class="modal-backdrop hidden">
+  <div class="modal">
+    <div class="shield" style="width:52px;height:60px;margin:0 auto 10px;background:linear-gradient(160deg,var(--surface-2),var(--surface));border:1.5px solid var(--gold);clip-path:polygon(50% 0%, 100% 18%, 100% 62%, 50% 100%, 0% 62%, 0% 18%);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;color:var(--gold);" id="modal-initial"></div>
+    <h3 id="modal-name"></h3>
+    <p>Enter your password to continue</p>
+    <div class="field">
+      <label for="pw-input">Password</label>
+      <input type="password" id="pw-input" autocomplete="current-password" />
+    </div>
+    <div class="error-text" id="pw-error"></div>
+    <div class="btn-row">
+      <button class="btn btn-ghost btn-full" id="pw-cancel">Cancel</button>
+      <button class="btn btn-full" id="pw-submit">Enter</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="app">
+  <div class="topbar">
+    <div class="who">
+      <div class="avatar-sm" id="tb-avatar"></div>
+      <div>
+        <h2 id="tb-name"></h2>
+        <span id="tb-role"></span>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" id="theme-toggle" title="Toggle theme">&#9788;</button>
+      <button class="icon-btn" id="logout-btn" title="Switch person">&#8635;</button>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <main>
+    <!-- HOME -->
+    <section class="panel" id="panel-home">
+      <div class="home-greeting">
+        <h1 id="home-hello">Welcome</h1>
+        <p id="home-date"></p>
+      </div>
+      <div class="stat-row" id="home-stats"></div>
+      <div class="rule"></div>
+      <div class="grid-2">
+        <div class="card">
+          <p class="section-title">Upcoming</p>
+          <div id="home-upcoming"><div class="empty-state">No upcoming events yet.</div></div>
+        </div>
+        <div class="card">
+          <p class="section-title">Open tasks</p>
+          <div id="home-tasks"><div class="empty-state">Nothing pending.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CALENDAR -->
+    <section class="panel" id="panel-calendar">
+      <div class="grid-2">
+        <div class="card">
+          <div class="cal-header">
+            <h2 id="cal-title">Month</h2>
+            <div class="cal-nav">
+              <button class="icon-btn" id="cal-prev">&#8592;</button>
+              <button class="icon-btn" id="cal-next">&#8594;</button>
+            </div>
+          </div>
+          <div class="cal-grid" id="cal-dow-row"></div>
+          <div class="cal-grid" id="cal-grid" style="margin-top:6px;"></div>
+        </div>
+        <div class="card">
+          <p class="section-title" id="cal-day-label">Events</p>
+          <div id="cal-day-events"></div>
+          <div class="rule"></div>
+          <p class="section-title">Add event</p>
+          <div class="field"><label>Title</label><input id="ev-title" placeholder="Dentist appointment" /></div>
+          <div class="field"><label>Date</label><input id="ev-date" type="date" /></div>
+          <div class="field"><label>Time (optional)</label><input id="ev-time" type="time" /></div>
+          <div class="field"><label>Notes (optional)</label><input id="ev-notes" placeholder="Details" /></div>
+          <div class="field">
+            <label>Visible to</label>
+            <div class="chip-row" id="ev-visible"></div>
+          </div>
+          <button class="btn btn-full" id="ev-add">Add to calendar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- LISTS -->
+    <section class="panel" id="panel-lists">
+      <div class="lists-layout">
+        <div>
+          <p class="section-title">Your lists</p>
+          <div id="list-nav"></div>
+          <div class="field" style="margin-top:14px;">
+            <input id="new-list-name" placeholder="New list name" />
+          </div>
+          <button class="btn btn-ghost btn-full" id="new-list-btn">+ Create list</button>
+        </div>
+        <div class="card" id="list-detail">
+          <div class="empty-state"><div class="glyph">&#9670;</div>Choose or create a list to begin.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MOOD -->
+    <section class="panel" id="panel-mood">
+      <p class="section-title" id="mood-heading">Parents' mood</p>
+      <div class="grid-2" id="mood-wrap"></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="panel" id="panel-settings">
+      <div class="grid-2">
+        <div class="card">
+          <p class="section-title">Appearance</p>
+          <p style="margin:0 0 8px; font-size:.85rem; color:var(--text-dim);">Accent color</p>
+          <div class="swatch-row" id="swatch-row"></div>
+          <div class="toggle-row">
+            <span>Dark mode</span>
+            <div class="switch" id="mode-switch"></div>
+          </div>
+        </div>
+        <div class="card">
+          <p class="section-title">Change password</p>
+          <div class="field"><label>Current password</label><input type="password" id="cur-pw" /></div>
+          <div class="field"><label>New password</label><input type="password" id="new-pw" /></div>
+          <div class="field"><label>Confirm new password</label><input type="password" id="new-pw2" /></div>
+          <div class="error-text" id="pw-change-error"></div>
+          <button class="btn btn-full" id="pw-change-btn">Update password</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+/* =========================================================
+   FAMILY HUB — app logic
+   Fill in firebaseConfig below with your own project's keys.
+   See SETUP.md for full instructions.
+========================================================= */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
+  getAuth, signInAnonymously
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc,
+  onSnapshot, query, deleteDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+// ---------- 1. YOUR FIREBASE CONFIG (see SETUP.md) ----------
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyD9K5zVjljEELNNFLo3WHoJC4yIHLoJMh0",
+  authDomain: "family-hub-1fd4d.firebaseapp.com",
+  projectId: "family-hub-1fd4d",
+  storageBucket: "family-hub-1fd4d.firebasestorage.app",
+  messagingSenderId: "548933673001",
+  appId: "1:548933673001:web:1e5491c579e65d3ec27c38",
+  measurementId: "G-TK47QEVQQ8"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ---------- 2. Family roster & default passwords ----------
+// Change these defaults any time from the Settings tab once logged in.
+const FAMILY = [
+  { id:"matthias", name:"Matthias", role:"Dad",   isParent:true,  initials:"M", defaultPassword:"Falke-77-Dad" },
+  { id:"susanne",  name:"Susanne",  role:"Mom",    isParent:true,  initials:"S", defaultPassword:"Rose-42-Mom" },
+  { id:"philipp",  name:"Philipp",  role:"Family", isParent:false, initials:"P", defaultPassword:"Loewe-19" },
+  { id:"jakob",    name:"Jakob",    role:"Family", isParent:false, initials:"J", defaultPassword:"Adler-23" },
+  { id:"helena",   name:"Helena",   role:"Family", isParent:false, initials:"H", defaultPassword:"Stern-08" },
+];
+const ACCENTS = ["#C9A24B","#7C93C7","#B5533C","#4F8C6A","#9B6FB0","#D68A3E"];
+
+let currentUser = null;   // full user doc + id
+let pendingLogin = null;  // family member being password-checked
+let usersCache = {};      // id -> user doc data
+let calMonth = new Date(); calMonth.setDate(1);
+let selectedDay = null;   // "YYYY-MM-DD"
+let eventsCache = [];
+let listsCache = [];
+let activeListId = null;
+
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+function toast(msg){
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2200);
+}
+
+// ---------- Auth (anonymous, shared for whole family DB) ----------
+signInAnonymously(auth).catch(err=>{
+  console.error(err);
+  toast("Could not connect to the database. Check firebaseConfig in index.html.");
+});
+
+// ---------- Seed default users if they don't exist yet ----------
+async function ensureSeeded(){
+  for (const f of FAMILY){
+    const ref = doc(db, "users", f.id);
+    const snap = await getDoc(ref);
+    if (!snap.exists()){
+      await setDoc(ref, {
+        name: f.name,
+        role: f.role,
+        isParent: f.isParent,
+        password: f.defaultPassword,
+        accent: "#C9A24B",
+        darkMode: true,
+        mood: 5
+      });
+    }
+  }
+}
+
+// ---------- Build login crest grid ----------
+function buildCrestGrid(){
+  const grid = $("#crest-grid");
+  grid.innerHTML = "";
+  FAMILY.forEach(f=>{
+    const el = document.createElement("div");
+    el.className = "crest";
+    el.innerHTML = `
+      <div class="shield">${f.initials}</div>
+      <div class="name">${f.name}</div>
+      <div class="role">${f.role}</div>
+    `;
+    el.addEventListener("click", ()=> openPasswordModal(f));
+    grid.appendChild(el);
+  });
+}
+
+function openPasswordModal(member){
+  pendingLogin = member;
+  $("#modal-initial").textContent = member.initials;
+  $("#modal-name").textContent = member.name;
+  $("#pw-input").value = "";
+  $("#pw-error").textContent = "";
+  $("#password-modal").classList.remove("hidden");
+  setTimeout(()=>$("#pw-input").focus(), 50);
+}
+$("#pw-cancel").addEventListener("click", ()=> $("#password-modal").classList.add("hidden"));
+$("#pw-input").addEventListener("keydown", e=>{ if(e.key==="Enter") attemptLogin(); });
+$("#pw-submit").addEventListener("click", attemptLogin);
+
+async function attemptLogin(){
+  if (!pendingLogin) return;
+  const entered = $("#pw-input").value;
+  const ref = doc(db, "users", pendingLogin.id);
+  const snap = await getDoc(ref);
+  if (!snap.exists()){
+    $("#pw-error").textContent = "Account not set up yet — try again in a moment.";
+    return;
+  }
+  const data = snap.data();
+  if (entered !== data.password){
+    $("#pw-error").textContent = "Incorrect password.";
+    return;
+  }
+  currentUser = { id: pendingLogin.id, ...data, ...FAMILY.find(f=>f.id===pendingLogin.id) , ...data};
+  $("#password-modal").classList.add("hidden");
+  enterApp();
+}
+
+// ---------- Enter app ----------
+function enterApp(){
+  document.documentElement.setAttribute("data-theme", currentUser.darkMode ? "dark" : "light");
+  document.documentElement.style.setProperty("--accent", currentUser.accent || "#C9A24B");
+
+  $("#login-screen").classList.add("hidden");
+  $("#app").classList.add("active");
+
+  $("#tb-avatar").textContent = currentUser.initials;
+  $("#tb-name").textContent = currentUser.name;
+  $("#tb-role").textContent = currentUser.role;
+
+  buildTabs();
+  subscribeUsers();
+  subscribeEvents();
+  subscribeLists();
+  renderHome();
+  renderCalendar();
+  renderSettings();
+}
+
+function buildTabs(){
+  const tabs = [
+    { id:"home", label:"Home" },
+    { id:"calendar", label:"Calendar" },
+    { id:"lists", label:"Lists" },
+    { id:"mood", label: currentUser.isParent ? "My Mood" : "Parents' Mood" },
+    { id:"settings", label:"Settings" },
+  ];
+  const wrap = $("#tabs");
+  wrap.innerHTML = "";
+  tabs.forEach((t,i)=>{
+    const b = document.createElement("button");
+    b.className = "tab-btn" + (i===0 ? " active" : "");
+    b.textContent = t.label;
+    b.dataset.tab = t.id;
+    b.addEventListener("click", ()=> switchTab(t.id));
+    wrap.appendChild(b);
+  });
+  switchTab("home");
+}
+
+function switchTab(id){
+  $$(".tab-btn").forEach(b=> b.classList.toggle("active", b.dataset.tab===id));
+  $$(".panel").forEach(p=> p.classList.remove("active"));
+  $("#panel-"+id).classList.add("active");
+  if (id==="mood") renderMood();
+  if (id==="lists") renderListNav();
+}
+
+$("#theme-toggle").addEventListener("click", async ()=>{
+  const dark = document.documentElement.getAttribute("data-theme") !== "dark";
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+  currentUser.darkMode = dark;
+  await updateDoc(doc(db,"users",currentUser.id), { darkMode: dark });
+  renderSettings();
+});
+
+$("#logout-btn").addEventListener("click", ()=>{
+  currentUser = null;
+  $("#app").classList.remove("active");
+  $("#login-screen").classList.remove("hidden");
+});
+
+// ---------- Live users (for mood + visibility names) ----------
+function subscribeUsers(){
+  FAMILY.forEach(f=>{
+    onSnapshot(doc(db,"users",f.id), snap=>{
+      if (snap.exists()){
+        usersCache[f.id] = { id:f.id, ...FAMILY.find(x=>x.id===f.id), ...snap.data() };
+        if (currentUser && currentUser.id===f.id){
+          currentUser = { ...currentUser, ...snap.data() };
+        }
+        renderMood();
+        renderHome();
+      }
+    });
+  });
+}
+
+// =========================================================
+// HOME
+// =========================================================
+function renderHome(){
+  if (!currentUser) return;
+  $("#home-hello").textContent = `Welcome back, ${currentUser.name}`;
+  $("#home-date").textContent = new Date().toLocaleDateString(undefined, { weekday:"long", year:"numeric", month:"long", day:"numeric" });
+
+  const visibleEvents = eventsCache.filter(canSee).sort((a,b)=> (a.date+a.time) > (b.date+b.time) ? 1 : -1);
+  const upcoming = visibleEvents.filter(e=> e.date >= todayISO()).slice(0,4);
+  const visibleLists = listsCache.filter(canSee);
+  let openTasks = [];
+  visibleLists.forEach(l=> (l.items||[]).forEach(it=>{ if(!it.done) openTasks.push({...it, listName:l.name}); }));
+
+  $("#home-stats").innerHTML = `
+    <div class="stat"><div class="num">${upcoming.length}</div><div class="lbl">Upcoming events</div></div>
+    <div class="stat"><div class="num">${openTasks.length}</div><div class="lbl">Open tasks</div></div>
+    <div class="stat"><div class="num">${visibleLists.length}</div><div class="lbl">Shared lists</div></div>
+  `;
+
+  const upWrap = $("#home-upcoming");
+  upWrap.innerHTML = upcoming.length ? "" : `<div class="empty-state">No upcoming events yet.</div>`;
+  upcoming.forEach(e=>{
+    const div = document.createElement("div");
+    div.className = "event-item";
+    div.innerHTML = `<div>
+      <div class="t">${escapeHtml(e.title)}</div>
+      <div class="d">${formatDate(e.date)}${e.time ? " · "+e.time : ""}</div>
+    </div>`;
+    upWrap.appendChild(div);
+  });
+
+  const taskWrap = $("#home-tasks");
+  taskWrap.innerHTML = openTasks.length ? "" : `<div class="empty-state">Nothing pending.</div>`;
+  openTasks.slice(0,5).forEach(t=>{
+    const div = document.createElement("div");
+    div.className = "event-item";
+    div.innerHTML = `<div><div class="t">${escapeHtml(t.text)}</div><div class="d">${escapeHtml(t.listName)}</div></div>`;
+    taskWrap.appendChild(div);
+  });
+}
+
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function formatDate(iso){
+  const d = new Date(iso+"T00:00:00");
+  return d.toLocaleDateString(undefined,{ weekday:"short", month:"short", day:"numeric" });
+}
+function escapeHtml(s){ return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+function canSee(item){
+  if (!currentUser) return false;
+  if (item.owner === currentUser.id) return true;
+  return (item.visibleTo||[]).includes(currentUser.id);
+}
+
+// =========================================================
+// CALENDAR
+// =========================================================
+function subscribeEvents(){
+  onSnapshot(collection(db,"events"), snap=>{
+    eventsCache = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+    renderCalendar();
+    renderHome();
+  });
+}
+
+function buildEvVisibleChips(){
+  const wrap = $("#ev-visible");
+  wrap.innerHTML = "";
+  FAMILY.filter(f=>f.id!==currentUser.id).forEach(f=>{
+    const c = document.createElement("div");
+    c.className = "chip";
+    c.textContent = f.name;
+    c.dataset.id = f.id;
+    c.addEventListener("click", ()=> c.classList.toggle("on"));
+    wrap.appendChild(c);
+  });
+}
+
+function renderCalendar(){
+  if (!currentUser) return;
+  buildEvVisibleChips();
+  const y = calMonth.getFullYear(), m = calMonth.getMonth();
+  $("#cal-title").textContent = calMonth.toLocaleDateString(undefined,{month:"long", year:"numeric"});
+
+  const dowRow = $("#cal-dow-row");
+  dowRow.innerHTML = "";
+  ["Su","Mo","Tu","We","Th","Fr","Sa"].forEach(d=>{
+    const el = document.createElement("div"); el.className="cal-dow"; el.textContent=d; dowRow.appendChild(el);
+  });
+
+  const grid = $("#cal-grid");
+  grid.innerHTML = "";
+  const firstDow = new Date(y,m,1).getDay();
+  const daysInMonth = new Date(y,m+1,0).getDate();
+  const visibleEvents = eventsCache.filter(canSee);
+
+  for (let i=0;i<firstDow;i++){
+    const e = document.createElement("div"); e.className="cal-day empty"; grid.appendChild(e);
+  }
+  for (let day=1; day<=daysInMonth; day++){
+    const iso = `${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+    const cell = document.createElement("div");
+    cell.className = "cal-day";
+    if (iso === todayISO()) cell.classList.add("today");
+    if (iso === selectedDay) cell.classList.add("selected");
+    const has = visibleEvents.some(e=> e.date===iso);
+    cell.innerHTML = `${day}` + (has ? `<div class="cal-dot"></div>` : "");
+    cell.addEventListener("click", ()=>{ selectedDay = iso; $("#ev-date").value = iso; renderCalendar(); renderDayEvents(); });
+    grid.appendChild(cell);
+  }
+  if (!selectedDay) selectedDay = todayISO();
+  $("#ev-date").value = $("#ev-date").value || selectedDay;
+  renderDayEvents();
+}
+
+function renderDayEvents(){
+  const label = selectedDay ? formatDate(selectedDay) : "Events";
+  $("#cal-day-label").textContent = "Events — " + label;
+  const list = eventsCache.filter(canSee).filter(e=> e.date === selectedDay).sort((a,b)=> (a.time||"") > (b.time||"") ? 1 : -1);
+  const wrap = $("#cal-day-events");
+  wrap.innerHTML = list.length ? "" : `<div class="empty-state">No events on this day.</div>`;
+  list.forEach(e=>{
+    const owner = usersCache[e.owner]?.name || e.owner;
+    const div = document.createElement("div");
+    div.className = "event-item";
+    div.innerHTML = `
+      <div>
+        <div class="t">${escapeHtml(e.title)}</div>
+        <div class="d">${e.time ? e.time+" · " : ""}${escapeHtml(e.notes||"")}</div>
+        <div class="who">Added by ${escapeHtml(owner)}</div>
+      </div>
+      ${e.owner===currentUser.id ? `<button class="x-btn" data-del="${e.id}">&#10005;</button>` : ""}
+    `;
+    wrap.appendChild(div);
+  });
+  wrap.querySelectorAll("[data-del]").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      await deleteDoc(doc(db,"events",btn.dataset.del));
+      toast("Event removed.");
+    });
+  });
+}
+
+$("#cal-prev").addEventListener("click", ()=>{ calMonth.setMonth(calMonth.getMonth()-1); renderCalendar(); });
+$("#cal-next").addEventListener("click", ()=>{ calMonth.setMonth(calMonth.getMonth()+1); renderCalendar(); });
+
+$("#ev-add").addEventListener("click", async ()=>{
+  const title = $("#ev-title").value.trim();
+  const date = $("#ev-date").value;
+  if (!title || !date){ toast("Please add a title and date."); return; }
+  const visibleTo = $$("#ev-visible .chip.on").map(c=>c.dataset.id);
+  await addDoc(collection(db,"events"), {
+    title, date,
+    time: $("#ev-time").value || "",
+    notes: $("#ev-notes").value.trim(),
+    owner: currentUser.id,
+    visibleTo,
+    createdAt: serverTimestamp()
+  });
+  $("#ev-title").value=""; $("#ev-time").value=""; $("#ev-notes").value="";
+  $$("#ev-visible .chip").forEach(c=>c.classList.remove("on"));
+  toast("Event added.");
+});
+
+// =========================================================
+// LISTS
+// =========================================================
+function subscribeLists(){
+  onSnapshot(collection(db,"lists"), snap=>{
+    listsCache = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+    renderListNav();
+    renderHome();
+    if (activeListId) renderListDetail();
+  });
+}
+
+function renderListNav(){
+  if (!currentUser) return;
+  const wrap = $("#list-nav");
+  wrap.innerHTML = "";
+  const visible = listsCache.filter(canSee);
+  if (!visible.length){
+    wrap.innerHTML = `<div class="empty-state" style="padding:12px 0;">No lists yet.</div>`;
+  }
+  visible.forEach(l=>{
+    const el = document.createElement("div");
+    el.className = "list-nav-item" + (l.id===activeListId ? " active" : "");
+    const doneCount = (l.items||[]).filter(i=>i.done).length;
+    el.innerHTML = `<span>${escapeHtml(l.name)}</span><span style="font-size:.7rem;color:var(--text-dim);">${doneCount}/${(l.items||[]).length}</span>`;
+    el.addEventListener("click", ()=>{ activeListId = l.id; renderListNav(); renderListDetail(); });
+    wrap.appendChild(el);
+  });
+}
+
+$("#new-list-btn").addEventListener("click", async ()=>{
+  const name = $("#new-list-name").value.trim();
+  if (!name) return;
+  const ref = await addDoc(collection(db,"lists"), {
+    name, owner: currentUser.id, visibleTo: [], items: [], createdAt: serverTimestamp()
+  });
+  $("#new-list-name").value = "";
+  activeListId = ref.id;
+  toast("List created.");
+});
+
+function renderListDetail(){
+  const list = listsCache.find(l=>l.id===activeListId);
+  const wrap = $("#list-detail");
+  if (!list || !canSee(list)){
+    wrap.innerHTML = `<div class="empty-state"><div class="glyph">&#9670;</div>Choose or create a list to begin.</div>`;
+    return;
+  }
+  const isOwner = list.owner === currentUser.id;
+  const items = list.items || [];
+  wrap.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <h3 style="margin:0;">${escapeHtml(list.name)}</h3>
+      ${isOwner ? `<button class="btn-ghost btn" id="del-list" style="padding:6px 14px; font-size:.78rem;">Delete list</button>` : ""}
+    </div>
+    <div id="list-items"></div>
+    <div class="field" style="margin-top:14px;"><input id="new-item-text" placeholder="Add an item and press Enter" /></div>
+    ${isOwner ? `<p class="section-title" style="margin-top:18px;">Visible to</p><div class="chip-row" id="list-visible"></div>` : ""}
+  `;
+  const itemsWrap = $("#list-items");
+  if (!items.length) itemsWrap.innerHTML = `<div class="empty-state">This list is empty.</div>`;
+  items.forEach((it, idx)=>{
+    const row = document.createElement("div");
+    row.className = "list-item" + (it.done ? " done" : "");
+    row.innerHTML = `
+      <div class="check ${it.done?"done":""}" data-idx="${idx}">${it.done?"&#10003;":""}</div>
+      <div class="txt">${escapeHtml(it.text)}</div>
+      <button class="x-btn" data-rm="${idx}">&#10005;</button>
+    `;
+    itemsWrap.appendChild(row);
+  });
+  itemsWrap.querySelectorAll(".check").forEach(c=>{
+    c.addEventListener("click", async ()=>{
+      const idx = +c.dataset.idx;
+      const newItems = [...items];
+      newItems[idx] = { ...newItems[idx], done: !newItems[idx].done };
+      await updateDoc(doc(db,"lists",list.id), { items:newItems });
+    });
+  });
+  itemsWrap.querySelectorAll("[data-rm]").forEach(b=>{
+    b.addEventListener("click", async ()=>{
+      const idx = +b.dataset.rm;
+      const newItems = items.filter((_,i)=>i!==idx);
+      await updateDoc(doc(db,"lists",list.id), { items:newItems });
+    });
+  });
+  $("#new-item-text").addEventListener("keydown", async (e)=>{
+    if (e.key==="Enter" && e.target.value.trim()){
+      const newItems = [...items, { text:e.target.value.trim(), done:false }];
+      await updateDoc(doc(db,"lists",list.id), { items:newItems });
+      e.target.value="";
+    }
+  });
+  if (isOwner){
+    const vWrap = $("#list-visible");
+    FAMILY.filter(f=>f.id!==currentUser.id).forEach(f=>{
+      const c = document.createElement("div");
+      c.className = "chip" + ((list.visibleTo||[]).includes(f.id) ? " on" : "");
+      c.textContent = f.name;
+      c.addEventListener("click", async ()=>{
+        const set = new Set(list.visibleTo||[]);
+        set.has(f.id) ? set.delete(f.id) : set.add(f.id);
+        await updateDoc(doc(db,"lists",list.id), { visibleTo:[...set] });
+      });
+      vWrap.appendChild(c);
+    });
+    $("#del-list")?.addEventListener("click", async ()=>{
+      await deleteDoc(doc(db,"lists",list.id));
+      activeListId = null;
+      renderListDetail();
+      toast("List deleted.");
+    });
+  }
+}
+
+// =========================================================
+// MOOD
+// =========================================================
+function moodMeta(v){
+  if (v<=2) return { emoji:"⛈️", label:"Stormy" };
+  if (v<=4) return { emoji:"🌥️", label:"Cloudy" };
+  if (v<=6) return { emoji:"⛅", label:"Steady" };
+  if (v<=8) return { emoji:"🌤️", label:"Bright" };
+  return { emoji:"☀️", label:"Radiant" };
+}
+
+function renderMood(){
+  if (!currentUser) return;
+  const wrap = $("#mood-wrap");
+  const heading = $("#mood-heading");
+  wrap.innerHTML = "";
+
+  if (currentUser.isParent){
+    heading.textContent = "Your mood & your partner's";
+    const me = usersCache[currentUser.id] || currentUser;
+    const partnerId = FAMILY.find(f=>f.isParent && f.id!==currentUser.id)?.id;
+    const partner = usersCache[partnerId];
+
+    const meVal = me.mood ?? 5;
+    const meta = moodMeta(meVal);
+    const meCard = document.createElement("div");
+    meCard.className = "mood-gauge";
+    meCard.innerHTML = `
+      <div class="who">Your mood</div>
+      <div class="mood-emoji">${meta.emoji}</div>
+      <div class="mood-label">${meta.label}</div>
+      <input type="range" min="0" max="10" value="${meVal}" id="mood-slider" />
+      <div class="mood-scale-lbls"><span>Rough day</span><span>Wonderful</span></div>
+    `;
+    wrap.appendChild(meCard);
+    meCard.querySelector("#mood-slider").addEventListener("input", async (e)=>{
+      const v = +e.target.value;
+      const m = moodMeta(v);
+      meCard.querySelector(".mood-emoji").textContent = m.emoji;
+      meCard.querySelector(".mood-label").textContent = m.label;
+      await updateDoc(doc(db,"users",currentUser.id), { mood: v });
+    });
+
+    if (partner){
+      const pVal = partner.mood ?? 5;
+      const pMeta = moodMeta(pVal);
+      const pCard = document.createElement("div");
+      pCard.className = "mood-gauge";
+      pCard.innerHTML = `
+        <div class="who">${escapeHtml(partner.name)}'s mood</div>
+        <div class="mood-emoji">${pMeta.emoji}</div>
+        <div class="mood-label">${pMeta.label}</div>
+        <input type="range" min="0" max="10" value="${pVal}" disabled style="opacity:.6;" />
+      `;
+      wrap.appendChild(pCard);
+    }
+  } else {
+    heading.textContent = "How are Mom & Dad doing today?";
+    FAMILY.filter(f=>f.isParent).forEach(f=>{
+      const u = usersCache[f.id];
+      const val = u?.mood ?? 5;
+      const meta = moodMeta(val);
+      const card = document.createElement("div");
+      card.className = "mood-gauge";
+      card.innerHTML = `
+        <div class="who">${f.name}</div>
+        <div class="mood-emoji">${meta.emoji}</div>
+        <div class="mood-label">${meta.label}</div>
+        <input type="range" min="0" max="10" value="${val}" disabled style="opacity:.6;" />
+      `;
+      wrap.appendChild(card);
+    });
+  }
+}
+
+// =========================================================
+// SETTINGS
+// =========================================================
+function renderSettings(){
+  if (!currentUser) return;
+  const sw = $("#swatch-row");
+  sw.innerHTML = "";
+  ACCENTS.forEach(color=>{
+    const s = document.createElement("div");
+    s.className = "swatch" + (currentUser.accent===color ? " active" : "");
+    s.style.background = color;
+    s.addEventListener("click", async ()=>{
+      document.documentElement.style.setProperty("--accent", color);
+      currentUser.accent = color;
+      await updateDoc(doc(db,"users",currentUser.id), { accent: color });
+      renderSettings();
+    });
+    sw.appendChild(s);
+  });
+
+  const modeSwitch = $("#mode-switch");
+  modeSwitch.classList.toggle("on", !!currentUser.darkMode);
+  modeSwitch.onclick = async ()=>{
+    const dark = !currentUser.darkMode;
+    currentUser.darkMode = dark;
+    document.documentElement.setAttribute("data-theme", dark ? "dark":"light");
+    await updateDoc(doc(db,"users",currentUser.id), { darkMode: dark });
+    renderSettings();
+  };
+}
+
+$("#pw-change-btn").addEventListener("click", async ()=>{
+  const cur = $("#cur-pw").value, n1 = $("#new-pw").value, n2 = $("#new-pw2").value;
+  const err = $("#pw-change-error");
+  err.textContent = "";
+  if (cur !== currentUser.password){ err.textContent = "Current password is incorrect."; return; }
+  if (n1.length < 4){ err.textContent = "New password must be at least 4 characters."; return; }
+  if (n1 !== n2){ err.textContent = "New passwords don't match."; return; }
+  await updateDoc(doc(db,"users",currentUser.id), { password: n1 });
+  currentUser.password = n1;
+  $("#cur-pw").value = ""; $("#new-pw").value = ""; $("#new-pw2").value = "";
+  toast("Password updated.");
+});
+
+// ---------- boot ----------
+ensureSeeded().then(buildCrestGrid).catch(()=>{
+  buildCrestGrid();
+  toast("Waiting for database connection…");
+});
+</script>
+</body>
+</html>
