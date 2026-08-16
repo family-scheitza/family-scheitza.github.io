@@ -1,0 +1,2673 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Familien-Hub</title>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#0A1830" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Familien-Hub" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<link rel="icon" href="icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- OneSignal Web Push SDK — see SETUP.md / chat instructions for the App ID you need to paste in below -->
+<script defer src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "f32f009b-7215-4ab0-ac82-e6781cec15ae",
+      serviceWorkerPath: "sw.js",
+      serviceWorkerParam: { scope: "/" },
+      notifyButton: { enable: false },
+    });
+  });
+</script>
+<style>
+  :root[data-theme="dark"]{
+    --bg:#0A1830;
+    --bg-2:#0F2247;
+    --surface:#122852;
+    --surface-2:#173066;
+    --text:#F3EEE1;
+    --text-dim:#AEBBD4;
+    --divider:rgba(201,162,75,.22);
+    --shadow: 0 18px 50px rgba(0,0,0,.45);
+    --overlay: rgba(6,13,28,.72);
+  }
+  :root[data-theme="light"]{
+    --bg:#F7F4EC;
+    --bg-2:#FFFFFF;
+    --surface:#FFFFFF;
+    --surface-2:#FBF8F0;
+    --text:#101B33;
+    --text-dim:#5A6684;
+    --divider:rgba(11,31,58,.14);
+    --shadow: 0 18px 40px rgba(16,27,51,.10);
+    --overlay: rgba(16,27,51,.35);
+  }
+  :root{
+    --accent:#C9A24B;
+    --accent-soft:#E4CD8E;
+    --navy:#0A1830;
+    --gold:var(--accent);
+    --danger:#B5533C;
+    --good:#4F8C6A;
+    --radius:16px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  html{ touch-action:manipulation; }
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    min-height:100dvh;
+    overscroll-behavior-y:contain;
+    transition:background .4s ease, color .4s ease;
+  }
+  h1,h2,h3,.display{
+    font-family:'Playfair Display',serif;
+    letter-spacing:.2px;
+  }
+  .hidden{display:none !important;}
+  button{font-family:inherit;cursor:pointer;}
+  input,select,textarea{font-family:inherit;}
+  ::selection{background:var(--accent-soft); color:#111;}
+
+  /* ---------- Ornamental rule ---------- */
+  .rule{
+    height:1px;
+    background:linear-gradient(90deg, transparent, var(--accent) 20%, var(--accent) 80%, transparent);
+    opacity:.55;
+    margin:18px 0;
+  }
+
+  /* ---------- LOGIN SCREEN ---------- */
+  #login-screen{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:calc(40px + env(safe-area-inset-top)) 20px calc(40px + env(safe-area-inset-bottom));
+    background:
+      radial-gradient(ellipse at 50% -10%, rgba(201,162,75,.18), transparent 55%),
+      var(--bg);
+  }
+  .brand{
+    text-align:center;
+    margin-bottom:44px;
+  }
+  .brand .crest-mark{
+    width:52px;height:52px;margin:0 auto 18px;
+    border:1.5px solid var(--gold);
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+  }
+  .brand .crest-mark:before{
+    content:"";
+    position:absolute; inset:6px;
+    border:1px solid var(--gold);
+    border-radius:50%;
+    opacity:.5;
+  }
+  .brand .crest-mark span{
+    font-family:'Playfair Display',serif;
+    color:var(--gold);
+    font-size:20px;
+  }
+  .brand h1{
+    font-size:2.4rem;
+    margin:0 0 6px;
+    font-weight:600;
+    color:var(--text);
+  }
+  .brand p{
+    margin:0;
+    color:var(--text-dim);
+    letter-spacing:2.5px;
+    text-transform:uppercase;
+    font-size:.72rem;
+  }
+  .crest-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:26px;
+    justify-content:center;
+    max-width:820px;
+  }
+  .crest{
+    width:150px;
+    background:var(--surface);
+    border:1px solid var(--divider);
+    border-radius:var(--radius);
+    padding:26px 14px 20px;
+    text-align:center;
+    box-shadow:var(--shadow);
+    cursor:pointer;
+    transition:transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+    position:relative;
+  }
+  .crest:hover{
+    transform:translateY(-6px);
+    border-color:var(--gold);
+  }
+  .crest .shield{
+    width:64px;height:74px;
+    margin:0 auto 14px;
+    background:linear-gradient(160deg, var(--surface-2), var(--surface));
+    border:1.5px solid var(--gold);
+    clip-path:polygon(50% 0%, 100% 18%, 100% 62%, 50% 100%, 0% 62%, 0% 18%);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Playfair Display',serif;
+    font-size:1.6rem;
+    color:var(--gold);
+  }
+  .crest .name{
+    font-weight:600;
+    font-size:1rem;
+    margin-bottom:2px;
+  }
+  .crest .role{
+    font-size:.68rem;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--text-dim);
+  }
+
+  /* password modal */
+  .modal-backdrop{
+    position:fixed; inset:0;
+    background:var(--overlay);
+    display:flex;align-items:center;justify-content:center;
+    z-index:50;
+    padding:20px;
+  }
+  .modal{
+    background:var(--surface);
+    border:1px solid var(--divider);
+    border-radius:var(--radius);
+    padding:32px;
+    width:100%;
+    max-width:360px;
+    box-shadow:var(--shadow);
+    text-align:center;
+  }
+  .modal h3{margin:6px 0 4px;}
+  .modal p{color:var(--text-dim); font-size:.85rem; margin:0 0 20px;}
+  .field{
+    text-align:left;
+    margin-bottom:14px;
+  }
+  .field label{
+    display:block;
+    font-size:.72rem;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    margin-bottom:6px;
+  }
+  .field input, .field select{
+    width:100%;
+    background:var(--bg-2);
+    border:1px solid var(--divider);
+    border-radius:10px;
+    padding:11px 13px;
+    color:var(--text);
+    font-size:16px;
+    outline:none;
+    transition:border-color .2s;
+  }
+  .field input:focus, .field select:focus{border-color:var(--gold);}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 22px;
+    border-radius:10px;
+    border:1px solid var(--gold);
+    background:var(--gold);
+    color:#1B1305;
+    font-weight:600;
+    font-size:.88rem;
+    transition:filter .2s, transform .15s;
+  }
+  .btn:hover{filter:brightness(1.08);}
+  .btn:active{transform:scale(.97);}
+  .btn-ghost{
+    background:transparent;
+    color:var(--text);
+    border:1px solid var(--divider);
+  }
+  .btn-ghost:hover{border-color:var(--gold);}
+  .btn-danger{border-color:var(--danger); background:transparent; color:var(--danger);}
+  .btn-full{width:100%;}
+  .btn-row{display:flex; gap:10px; margin-top:18px;}
+  .error-text{color:var(--danger); font-size:.82rem; min-height:18px; margin-top:2px;}
+
+  /* ---------- APP SHELL ---------- */
+  #app{min-height:100vh; display:none;}
+  #app.active{display:block;}
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:calc(18px + env(safe-area-inset-top)) 28px 18px;
+    border-bottom:1px solid var(--divider);
+    background:var(--bg-2);
+    position:sticky; top:0; z-index:20;
+  }
+  .topbar .who{display:flex; align-items:center; gap:12px; min-width:0; flex:1;}
+  .avatar-sm{
+    width:38px;height:38px;border-radius:50%; flex-shrink:0;
+    background:linear-gradient(160deg, var(--surface-2), var(--surface));
+    border:1.5px solid var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Playfair Display',serif; color:var(--gold); font-size:.95rem;
+  }
+  .topbar .who > div{ min-width:0; }
+  .topbar .who h2{margin:0; font-size:1.05rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .topbar .who span{font-size:.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px;}
+  .top-actions{display:flex; align-items:center; gap:10px; flex-shrink:0;}
+  .icon-btn{
+    width:38px;height:38px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:transparent; border:1px solid var(--divider); color:var(--text);
+    transition:border-color .2s, color .2s;
+  }
+  .icon-btn:hover{border-color:var(--gold); color:var(--gold);}
+
+  .nav-bar{
+    position:relative;
+    padding:12px 28px 14px;
+    background:var(--bg-2);
+    border-bottom:1px solid var(--divider);
+  }
+  .nav-trigger{
+    display:flex; align-items:center; gap:10px;
+    background:var(--surface); border:1px solid var(--divider);
+    border-radius:12px; padding:10px 16px;
+    color:var(--text); font-weight:600; font-size:.92rem;
+    transition:border-color .2s, box-shadow .2s;
+  }
+  .nav-trigger:hover{ border-color:var(--accent); box-shadow:0 4px 14px rgba(201,162,75,.18); }
+  .nav-trigger-icon{ width:20px; height:20px; display:inline-flex; color:var(--accent); }
+  .nav-trigger-icon svg{ width:100%; height:100%; display:block; }
+  .nav-chevron{
+    margin-left:2px; color:var(--accent); font-size:.75rem;
+    transition:transform .3s ease;
+  }
+  .nav-trigger.open .nav-chevron{ transform:rotate(180deg); }
+  .nav-dropdown{
+    position:absolute; left:28px; top:calc(100% - 2px);
+    min-width:260px; max-width:90vw;
+    background:var(--surface); border:1px solid var(--divider);
+    border-radius:14px; box-shadow:var(--shadow);
+    padding:8px; z-index:30;
+    display:grid; grid-template-columns:1fr;
+    opacity:0; visibility:hidden;
+    transform:translateY(-10px) scale(.97);
+    transform-origin:top left;
+    transition:opacity .22s ease, transform .22s ease, visibility 0s linear .22s;
+  }
+  .nav-dropdown.open{
+    opacity:1; visibility:visible;
+    transform:translateY(6px) scale(1);
+    transition:opacity .22s ease, transform .22s ease, visibility 0s;
+  }
+  .nav-item{
+    display:flex; align-items:center; gap:12px;
+    padding:11px 14px; border-radius:10px;
+    color:var(--text); font-size:.92rem; font-weight:500;
+    background:transparent; text-align:left;
+    opacity:0; transform:translateX(-8px);
+    animation:navItemIn .3s ease forwards;
+  }
+  .nav-dropdown.open .nav-item{ animation-play-state:running; }
+  @keyframes navItemIn{ to{ opacity:1; transform:translateX(0); } }
+  .nav-item:hover{ background:var(--surface-2); }
+  .nav-item.active{ color:var(--accent); background:rgba(201,162,75,.1); font-weight:700; }
+  .nav-item .ico{ width:22px; height:22px; flex-shrink:0; color:var(--accent); }
+  .nav-item .ico svg{ width:100%; height:100%; display:block; }
+  .nav-item .badge{
+    margin-left:auto; background:var(--accent); color:#1B1305;
+    font-size:.68rem; font-weight:700; border-radius:20px;
+    padding:2px 8px; min-width:18px; text-align:center;
+  }
+  .nav-divider{ height:1px; background:var(--divider); margin:6px 4px; }
+
+  main{max-width:1000px; margin:0 auto; padding:32px 24px calc(80px + env(safe-area-inset-bottom));}
+  .panel{display:none;}
+  .panel.active{display:block; animation:fade .35s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--divider);
+    border-radius:var(--radius);
+    padding:24px 26px;
+    box-shadow:var(--shadow);
+  }
+  @media (max-width:600px){
+    .card{ padding:18px; }
+  }
+  .grid-2{display:grid; grid-template-columns:1.3fr 1fr; gap:20px;}
+  @media (max-width:760px){ .grid-2{grid-template-columns:1fr;} }
+
+  /* HOME */
+  .home-greeting{margin-bottom:24px;}
+  .home-greeting h1{font-size:1.9rem; margin:0 0 4px;}
+  .home-greeting p{color:var(--text-dim); margin:0;}
+  .stat-row{display:flex; gap:16px; flex-wrap:wrap; margin-top:20px;}
+  .stat{
+    flex:1; min-width:150px;
+    background:var(--surface); border:1px solid var(--divider); border-radius:14px;
+    padding:16px 18px;
+  }
+  .stat .num{font-family:'Playfair Display',serif; font-size:1.8rem; color:var(--gold);}
+  .stat .lbl{font-size:.75rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px;}
+
+  .quick-grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(120px,1fr));
+    gap:12px;
+  }
+  .quick-tile{
+    background:var(--surface); border:1px solid var(--divider); border-radius:14px;
+    padding:16px 10px; text-align:center; cursor:pointer;
+    transition:transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    position:relative;
+  }
+  .quick-tile:hover{ transform:translateY(-3px); border-color:var(--accent); box-shadow:0 10px 24px rgba(201,162,75,.16); }
+  .quick-tile .ico{ width:30px; height:30px; margin:0 auto 8px; display:block; color:var(--accent); }
+  .quick-tile .ico svg{ width:100%; height:100%; }
+  .quick-tile .lbl{ font-size:.78rem; font-weight:600; }
+  .quick-tile .badge{
+    position:absolute; top:8px; right:10px;
+    background:var(--accent); color:#1B1305; font-size:.65rem; font-weight:700;
+    border-radius:20px; padding:1px 7px;
+  }
+  .home-card-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .link-btn{
+    background:none; border:none; color:var(--accent); font-size:.78rem; font-weight:600;
+    padding:4px 6px;
+  }
+  .link-btn:hover{ text-decoration:underline; }
+  .home-msg-preview{ padding:10px 0; border-bottom:1px solid var(--divider); }
+  .home-msg-preview:last-child{ border-bottom:none; }
+  .home-msg-preview .t{ font-weight:600; font-size:.85rem; }
+  .home-msg-preview .d{ font-size:.78rem; color:var(--text-dim); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  /* CALENDAR */
+  .cal-header{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;}
+  .cal-header h2{margin:0; font-size:1.3rem;}
+  .cal-nav{display:flex; gap:8px;}
+  .cal-grid{display:grid; grid-template-columns:repeat(7,1fr); gap:6px;}
+  .cal-dow{text-align:center; font-size:.68rem; letter-spacing:1px; text-transform:uppercase; color:var(--text-dim); padding-bottom:6px;}
+  .cal-day{
+    min-height:64px;
+    border:1px solid var(--divider);
+    border-radius:10px;
+    padding:6px 8px;
+    font-size:.82rem;
+    cursor:pointer;
+    position:relative;
+    transition:border-color .2s, background .2s;
+  }
+  .cal-day:hover{border-color:var(--gold);}
+  .cal-day.empty{visibility:hidden;}
+  .cal-day.today{border-color:var(--gold); box-shadow:inset 0 0 0 1px var(--gold);}
+  .cal-day.selected{background:var(--surface-2);}
+  .cal-dot{
+    width:6px;height:6px;border-radius:50%;background:var(--gold);
+    position:absolute; bottom:6px; left:8px;
+  }
+  .event-item{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    padding:12px 0; border-bottom:1px solid var(--divider); gap:10px;
+  }
+  .event-item:last-child{border-bottom:none;}
+  .event-item .t{font-weight:600; font-size:.9rem;}
+  .event-item .d{font-size:.8rem; color:var(--text-dim); margin-top:2px;}
+  .event-item .who{font-size:.68rem; color:var(--gold); margin-top:4px; text-transform:uppercase; letter-spacing:.5px;}
+  .chip{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 12px; border-radius:20px;
+    border:1px solid var(--divider);
+    font-size:.78rem;
+    cursor:pointer; user-select:none;
+    background:var(--bg-2);
+  }
+  .chip.on{border-color:var(--gold); color:var(--gold); background:rgba(201,162,75,.1);}
+  .chip-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:6px;}
+  .x-btn{background:none; border:none; color:var(--text-dim); font-size:1rem; line-height:1;}
+  .x-btn:hover{color:var(--danger);}
+
+  /* LISTS */
+  .lists-layout{display:grid; grid-template-columns:230px 1fr; gap:20px;}
+  @media (max-width:700px){ .lists-layout{grid-template-columns:1fr;} }
+  .list-nav-item{
+    padding:12px 14px; border-radius:10px; cursor:pointer;
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:.9rem; margin-bottom:6px;
+    border:1px solid transparent;
+  }
+  .list-nav-item:hover{border-color:var(--divider);}
+  .list-nav-item.active{background:var(--surface-2); border-color:var(--gold); color:var(--gold); font-weight:600;}
+  .list-item{
+    display:flex; align-items:center; gap:14px;
+    padding:16px 8px; border-bottom:1px solid var(--divider);
+  }
+  .list-item:last-child{border-bottom:none;}
+  .check{
+    width:25px; height:25px; border-radius:50%;
+    border:1.5px solid var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; cursor:pointer; font-size:.85rem; color:var(--gold);
+  }
+  .check.done{background:var(--gold); color:#1B1305;}
+  .list-item .txt{flex:1; font-size:.95rem; line-height:1.4;}
+  .list-item.done .txt{text-decoration:line-through; color:var(--text-dim);}
+  .txt-col{ flex:1; min-width:0; display:flex; flex-direction:column; gap:5px; }
+  .todo-meta{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+
+  /* TODOS */
+  .assign-tag{
+    font-size:.68rem; letter-spacing:.5px; text-transform:uppercase;
+    color:var(--accent); border:1px solid var(--divider); border-radius:20px;
+    padding:4px 10px; white-space:nowrap;
+  }
+  .todo-head{
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;
+    margin-bottom:18px;
+  }
+  .todo-progress-wrap{ display:flex; align-items:center; gap:12px; }
+  .todo-progress-bar{
+    width:130px; height:8px; border-radius:6px; background:var(--divider); overflow:hidden;
+  }
+  .todo-progress-fill{
+    height:100%; background:linear-gradient(90deg, var(--accent), var(--accent-soft));
+    width:0%; transition:width .4s ease;
+  }
+  #todo-progress-label{ font-size:.74rem; color:var(--text-dim); white-space:nowrap; }
+  .todo-add-row{
+    display:flex; gap:10px; margin-top:20px; padding-top:18px;
+    border-top:1px solid var(--divider); flex-wrap:wrap;
+  }
+  .todo-add-row input[type="text"], .todo-add-row input:not([type]){ flex:2; min-width:160px; }
+  .todo-add-row input[type="date"]{ flex:1; min-width:130px; }
+  .todo-add-row input{
+    background:var(--bg-2); border:1px solid var(--divider); border-radius:10px;
+    padding:13px 14px; color:var(--text); font-size:16px; outline:none;
+  }
+  .todo-add-row input:focus{ border-color:var(--accent); }
+  .todo-add-row .btn{ padding:13px 22px; }
+  .due-tag{
+    font-size:.7rem; color:var(--text-dim); white-space:nowrap;
+    display:flex; align-items:center; gap:4px;
+    background:var(--bg-2); border-radius:8px; padding:3px 8px;
+  }
+  .due-tag.overdue{ color:var(--danger); font-weight:600; }
+  .list-item .x-btn{
+    width:32px; height:32px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; font-size:1rem;
+  }
+  .list-item .x-btn:hover{ background:var(--bg-2); }
+
+  /* CHAT */
+  .chat-messages{
+    max-height:56vh; overflow-y:auto; display:flex; flex-direction:column; gap:16px;
+    padding:4px 2px 12px;
+  }
+  .chat-bubble{
+    max-width:80%; padding:13px 16px; border-radius:16px;
+    background:var(--surface-2); border:1px solid var(--divider);
+    font-size:.92rem; line-height:1.45; align-self:flex-start;
+  }
+  .chat-bubble.mine{ align-self:flex-end; border-color:var(--accent); }
+  .chat-bubble .sender{ font-size:.7rem; color:var(--accent); text-transform:uppercase; letter-spacing:1px; margin-bottom:5px; }
+  .chat-bubble .time{ font-size:.66rem; color:var(--text-dim); margin-top:6px; }
+
+  /* MESSAGE ACTIONS: reactions + delete */
+  .msg-actions{ display:flex; align-items:center; gap:8px; margin-top:6px; flex-wrap:wrap; position:relative; }
+  .reaction-row{ display:flex; gap:5px; flex-wrap:wrap; }
+  .reaction-chip{
+    font-size:.72rem; background:var(--bg-2); border:1px solid var(--divider);
+    border-radius:20px; padding:2px 8px; cursor:pointer; color:var(--text);
+  }
+  .reaction-chip.mine{ border-color:var(--accent); background:var(--accent-soft); color:var(--navy); }
+  .reaction-picker{ position:relative; }
+  .react-toggle{
+    background:none; border:none; font-size:.85rem; cursor:pointer; opacity:.7; padding:0 2px;
+  }
+  .react-toggle:hover{ opacity:1; }
+  .reaction-popover{
+    position:absolute; bottom:120%; left:0; display:flex; gap:4px;
+    background:var(--surface-2); border:1px solid var(--divider); border-radius:20px;
+    padding:5px 8px; z-index:5; box-shadow:0 6px 18px rgba(0,0,0,.25);
+  }
+  .reaction-popover.hidden{ display:none; }
+  .reaction-popover button{
+    background:none; border:none; font-size:1rem; cursor:pointer; padding:2px 3px;
+    transition:transform .12s;
+  }
+  .reaction-popover button:hover{ transform:scale(1.25); }
+  .msg-actions .x-btn{ margin-left:auto; }
+  .chat-input-row{
+    display:flex; gap:12px; margin-top:18px; padding-top:16px;
+    border-top:1px solid var(--divider); align-items:center;
+  }
+  .chat-input-row input{
+    flex:1; background:var(--bg-2); border:1px solid var(--divider); border-radius:24px;
+    padding:13px 18px; color:var(--text); font-size:16px; outline:none;
+  }
+  .chat-input-row input:focus{ border-color:var(--accent); }
+  .chat-input-row .btn{ padding:13px 22px; border-radius:24px; }
+  .chat-input-row #attach-btn{ width:44px; height:44px; flex-shrink:0; }
+
+  /* CONVERSATIONS / RECIPIENT PICKER */
+  .conv-item{
+    display:flex; align-items:center; gap:16px;
+    padding:16px; border-radius:16px; border:1px solid var(--divider);
+    background:var(--surface); margin-bottom:12px; cursor:pointer;
+    transition:border-color .2s, transform .18s;
+  }
+  .conv-item:hover{ border-color:var(--accent); transform:translateX(3px); }
+  .conv-avatar{
+    width:50px; height:50px; border-radius:50%; flex-shrink:0;
+    background:linear-gradient(160deg, var(--surface-2), var(--surface));
+    border:1.5px solid var(--accent);
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.3rem;
+  }
+  .conv-info{ flex:1; min-width:0; }
+  .conv-info .name{ font-weight:600; font-size:.98rem; }
+  .conv-info .preview{ font-size:.82rem; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:4px; }
+  .conv-meta{ text-align:right; flex-shrink:0; }
+  .conv-meta .time{ font-size:.7rem; color:var(--text-dim); }
+  .conv-group-label{
+    font-size:.72rem; letter-spacing:1px; text-transform:uppercase; color:var(--text-dim);
+    margin:24px 0 12px;
+  }
+  .conv-group-label:first-child{ margin-top:4px; }
+  .thread-header{ display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+  .thread-header h3{ margin:0; font-size:1.15rem; }
+
+  /* ATTACHMENTS */
+  .attachment-preview{
+    display:flex; align-items:center; gap:10px;
+    background:var(--bg-2); border:1px solid var(--accent); border-radius:12px;
+    padding:8px 12px; margin-top:10px;
+  }
+  .attachment-preview img{ width:44px; height:44px; object-fit:cover; border-radius:8px; }
+  .attachment-preview .info{ flex:1; font-size:.82rem; }
+  .attachment-preview .remove-att{ color:var(--danger); background:none; border:none; font-size:1rem; }
+  .attachment-bubble-img{
+    max-width:220px; border-radius:10px; display:block; margin-bottom:4px; cursor:pointer;
+  }
+  .attachment-file-chip{
+    display:flex; align-items:center; gap:8px;
+    background:var(--bg-2); border:1px solid var(--divider); border-radius:10px;
+    padding:8px 12px; font-size:.82rem; text-decoration:none; color:var(--text); margin-bottom:4px;
+  }
+  .attachment-file-chip:hover{ border-color:var(--accent); }
+  .attachment-file-chip .ico{ font-size:1.2rem; }
+
+  /* WEATHER */
+  .weather-card{
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .weather-card .icon{ font-size:2.6rem; }
+  .weather-card .temp{ font-family:'Playfair Display',serif; font-size:1.9rem; color:var(--accent); }
+  .weather-card .place{ font-size:.8rem; color:var(--text-dim); }
+  .weather-forecast{ display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; flex-basis:100%; }
+  .weather-forecast .day{
+    flex:1; min-width:70px; text-align:center; background:var(--bg-2);
+    border:1px solid var(--divider); border-radius:10px; padding:8px 6px; font-size:.75rem;
+  }
+
+  /* MOOD */
+  .mood-gauge{
+    background:var(--surface); border:1px solid var(--divider); border-radius:16px;
+    padding:22px; text-align:center;
+  }
+  .mood-gauge .who{font-weight:600; margin-bottom:14px;}
+  .mood-emoji{font-size:2.4rem; margin-bottom:6px;}
+  .mood-label{color:var(--gold); font-size:.85rem; text-transform:uppercase; letter-spacing:1px; margin-bottom:14px;}
+  input[type="range"]{
+    width:100%; accent-color:var(--gold);
+  }
+  .mood-scale-lbls{display:flex; justify-content:space-between; font-size:.68rem; color:var(--text-dim); margin-top:4px;}
+
+  /* SETTINGS */
+  .swatch-row{display:flex; gap:10px; flex-wrap:wrap; margin:10px 0 4px;}
+  .swatch{
+    width:34px;height:34px;border-radius:50%;
+    border:2px solid transparent;
+    cursor:pointer;
+  }
+  .swatch.active{border-color:var(--text);}
+  .toggle-row{display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--divider);}
+  .toggle-row:last-child{border-bottom:none;}
+  .switch{
+    width:46px; height:26px; border-radius:14px; background:var(--divider);
+    position:relative; cursor:pointer; transition:background .2s;
+  }
+  .switch.on{background:var(--gold);}
+  .switch:before{
+    content:""; position:absolute; top:3px; left:3px;
+    width:20px; height:20px; border-radius:50%; background:var(--bg-2);
+    transition:left .2s;
+  }
+  .switch.on:before{left:23px;}
+
+  .empty-state{
+    text-align:center; padding:40px 20px; color:var(--text-dim);
+  }
+  .empty-state .glyph{font-size:1.8rem; color:var(--gold); margin-bottom:8px;}
+
+  .section-title{
+    font-size:.72rem; letter-spacing:1.5px; text-transform:uppercase;
+    color:var(--text-dim); margin:0 0 14px;
+  }
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    background:var(--surface); border:1px solid var(--gold); color:var(--text);
+    padding:12px 20px; border-radius:10px; box-shadow:var(--shadow);
+    font-size:.85rem; z-index:100; opacity:0; pointer-events:none;
+    transition:opacity .25s, transform .25s;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(-6px);}
+
+  /* ---------- PARTICLE BACKGROUND ---------- */
+  #bg-particles{
+    position:fixed; inset:0;
+    width:100%; height:100%;
+    z-index:0;
+    pointer-events:none;
+    opacity:.55;
+  }
+  :root[data-theme="light"] #bg-particles{ opacity:.32; }
+  #login-screen, #app{ position:relative; z-index:1; }
+  .topbar, .tabs{ position:sticky; z-index:20; }
+
+  /* ---------- CREST 3D TILT + SHIMMER SWEEP ---------- */
+  .crest{
+    transform-style:preserve-3d;
+    will-change:transform;
+    overflow:hidden;
+    isolation:isolate;
+  }
+  .crest::before{
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(115deg, transparent 40%, rgba(255,236,190,.55) 50%, transparent 60%);
+    background-size:220% 220%;
+    background-position:150% 150%;
+    opacity:0;
+    pointer-events:none;
+    z-index:2;
+    transition:opacity .25s ease;
+  }
+  .crest.sweep::before{
+    opacity:1;
+    animation:sweepMove .85s ease forwards;
+  }
+  @keyframes sweepMove{
+    0%{ background-position:150% 150%; }
+    100%{ background-position:-50% -50%; }
+  }
+  .crest:hover{
+    box-shadow:0 22px 48px rgba(0,0,0,.35), 0 0 0 1px var(--gold), 0 0 26px rgba(201,162,75,.35);
+  }
+  .crest .shield{
+    transition:transform .35s ease, filter .35s ease;
+  }
+  .crest:hover .shield{
+    filter:drop-shadow(0 0 10px rgba(201,162,75,.55));
+  }
+
+  /* ---------- BUTTON RIPPLE ---------- */
+  .btn, .icon-btn, .chip, .swatch, .list-nav-item, .nav-item, .nav-trigger{ position:relative; overflow:hidden; }
+  .ripple{
+    position:absolute;
+    border-radius:50%;
+    background:rgba(255,244,214,.55);
+    transform:scale(0);
+    animation:rippleAnim .6s ease-out forwards;
+    pointer-events:none;
+  }
+  :root[data-theme="light"] .ripple{ background:rgba(120,90,20,.28); }
+  @keyframes rippleAnim{
+    to{ transform:scale(2.6); opacity:0; }
+  }
+
+  /* ---------- MICRO-HOVERS ---------- */
+  .btn{ transition:filter .2s, transform .15s, box-shadow .25s; }
+  .btn:hover{ box-shadow:0 6px 18px rgba(201,162,75,.35); transform:translateY(-1px); }
+
+  .card{ transition:transform .3s ease, box-shadow .3s ease, border-color .3s ease; }
+  .card:hover{
+    transform:translateY(-3px);
+    border-color:var(--gold);
+    box-shadow:var(--shadow), 0 0 24px rgba(201,162,75,.16);
+  }
+
+  .icon-btn{ transition:transform .25s ease, border-color .2s, color .2s; }
+  .icon-btn:hover{ transform:rotate(-10deg) scale(1.08); }
+
+  .swatch{ transition:transform .2s ease, box-shadow .2s ease; }
+  .swatch:hover{ transform:scale(1.18); box-shadow:0 0 0 3px rgba(201,162,75,.3); }
+
+  .chip{ transition:transform .18s ease, border-color .2s, background .2s; }
+  .chip:hover{ transform:translateY(-2px); border-color:var(--gold); }
+
+  .list-nav-item{ transition:transform .18s ease, border-color .2s, background .2s; }
+  .list-nav-item:hover{ transform:translateX(3px); }
+
+  .cal-day{ transition:transform .18s ease, border-color .2s, box-shadow .2s; }
+  .cal-day:not(.empty):hover{ transform:translateY(-2px) scale(1.03); box-shadow:0 6px 16px rgba(201,162,75,.18); }
+
+  .check{ transition:transform .18s ease, background .2s, box-shadow .2s; }
+  .check:hover{ transform:scale(1.15); box-shadow:0 0 10px rgba(201,162,75,.4); }
+
+  .x-btn{ transition:transform .2s ease; }
+  .x-btn:hover{ transform:rotate(90deg) scale(1.2); }
+
+  .stat{ transition:transform .25s ease, border-color .25s ease; }
+  .stat:hover{ transform:translateY(-3px); border-color:var(--gold); }
+
+  .mood-gauge{ transition:transform .3s ease, box-shadow .3s ease; }
+  .mood-gauge:hover{ transform:translateY(-3px); box-shadow:var(--shadow), 0 0 22px rgba(201,162,75,.16); }
+
+  @media (prefers-reduced-motion: reduce){
+    .crest, .card, .btn, .icon-btn, .swatch, .chip, .list-nav-item, .cal-day, .check, .x-btn, .stat, .mood-gauge{
+      transition:none !important; animation:none !important;
+    }
+    #bg-particles{ display:none; }
+  }
+</style>
+</head>
+<body>
+<canvas id="bg-particles"></canvas>
+
+<!-- ================= LOGIN ================= -->
+<div id="login-screen">
+  <div class="brand">
+    <div class="crest-mark"><span>F</span></div>
+    <h1>Familien-Hub</h1>
+    <p> Familie &middot; Scheitza </p>
+  </div>
+  <div class="crest-grid" id="crest-grid"></div>
+</div>
+
+<div id="password-modal" class="modal-backdrop hidden">
+  <div class="modal">
+    <div class="shield" style="width:52px;height:60px;margin:0 auto 10px;background:linear-gradient(160deg,var(--surface-2),var(--surface));border:1.5px solid var(--gold);clip-path:polygon(50% 0%, 100% 18%, 100% 62%, 50% 100%, 0% 62%, 0% 18%);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;color:var(--gold);" id="modal-initial"></div>
+    <h3 id="modal-name"></h3>
+    <p>Gib dein Passwort ein, um fortzufahren</p>
+    <div class="field">
+      <label for="pw-input">Passwort</label>
+      <input type="password" id="pw-input" autocomplete="current-password" />
+    </div>
+    <div class="error-text" id="pw-error"></div>
+    <div class="btn-row">
+      <button class="btn btn-ghost btn-full" id="pw-cancel">Abbrechen</button>
+      <button class="btn btn-full" id="pw-submit">Anmelden</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+<div id="app">
+  <div class="topbar">
+    <div class="who">
+      <div class="avatar-sm" id="tb-avatar"></div>
+      <div>
+        <h2 id="tb-name"></h2>
+        <span id="tb-role"></span>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="icon-btn" id="theme-toggle" title="Ansicht wechseln">&#9788;</button>
+      <button class="icon-btn" id="logout-btn" title="Person wechseln">&#8635;</button>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <button class="nav-trigger" id="nav-trigger">
+      <span class="nav-trigger-icon" id="nav-trigger-icon">🏠</span>
+      <span class="nav-trigger-label" id="nav-trigger-label">Start</span>
+      <span class="nav-chevron" id="nav-chevron">&#9662;</span>
+    </button>
+    <div class="nav-dropdown" id="nav-dropdown"></div>
+  </div>
+
+  <main>
+    <!-- HOME -->
+    <section class="panel" id="panel-home">
+      <div class="home-greeting">
+        <h1 id="home-hello">Willkommen</h1>
+        <p id="home-date"></p>
+      </div>
+      <div class="card weather-card" id="home-weather">
+        <div class="empty-state" style="padding:6px 0; width:100%;">Wetter wird geladen …</div>
+      </div>
+      <div class="stat-row" id="home-stats"></div>
+
+      <p class="section-title" style="margin-top:26px;">Schnellzugriff</p>
+      <div class="quick-grid" id="home-quick-grid"></div>
+
+      <div class="rule"></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="home-card-head">
+            <p class="section-title" style="margin:0;">Anstehend</p>
+            <button class="link-btn" data-goto="calendar">Kalender &rarr;</button>
+          </div>
+          <div id="home-upcoming"><div class="empty-state">Noch keine anstehenden Termine.</div></div>
+        </div>
+        <div class="card">
+          <div class="home-card-head">
+            <p class="section-title" style="margin:0;">Meine Aufgaben</p>
+            <button class="link-btn" data-goto="todos">Alle &rarr;</button>
+          </div>
+          <div id="home-tasks"><div class="empty-state">Nichts offen.</div></div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:20px;">
+        <div class="card">
+          <div class="home-card-head">
+            <p class="section-title" style="margin:0;">Neueste Nachrichten</p>
+            <button class="link-btn" data-goto="messages">Alle &rarr;</button>
+          </div>
+          <div id="home-messages"><div class="empty-state">Noch keine Nachrichten.</div></div>
+        </div>
+        <div class="card">
+          <div class="home-card-head">
+            <p class="section-title" style="margin:0;">Meine Listen</p>
+            <button class="link-btn" data-goto="lists">Alle &rarr;</button>
+          </div>
+          <div id="home-lists"><div class="empty-state">Noch keine Listen.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CALENDAR -->
+    <section class="panel" id="panel-calendar">
+      <div class="grid-2">
+        <div class="card">
+          <div class="cal-header">
+            <h2 id="cal-title">Monat</h2>
+            <div class="cal-nav">
+              <button class="icon-btn" id="cal-prev">&#8592;</button>
+              <button class="icon-btn" id="cal-next">&#8594;</button>
+            </div>
+          </div>
+          <div class="cal-grid" id="cal-dow-row"></div>
+          <div class="cal-grid" id="cal-grid" style="margin-top:6px;"></div>
+        </div>
+        <div class="card">
+          <p class="section-title" id="cal-day-label">Termine</p>
+          <div id="cal-day-events"></div>
+          <div class="rule"></div>
+          <p class="section-title">Termin hinzufügen</p>
+          <div class="field"><label>Titel</label><input id="ev-title" placeholder="Zahnarzttermin" /></div>
+          <div class="field"><label>Datum</label><input id="ev-date" type="date" /></div>
+          <div class="field"><label>Uhrzeit (optional)</label><input id="ev-time" type="time" /></div>
+          <div class="field"><label>Notizen (optional)</label><input id="ev-notes" placeholder="Details" /></div>
+          <div class="field">
+            <label>Sichtbar für</label>
+            <div class="chip-row" id="ev-visible"></div>
+          </div>
+          <button class="btn btn-full" id="ev-add">Zum Kalender hinzufügen</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- LISTS -->
+    <section class="panel" id="panel-lists">
+      <div class="lists-layout">
+        <div>
+          <p class="section-title">Deine Listen</p>
+          <div id="list-nav"></div>
+          <div class="field" style="margin-top:14px;">
+            <input id="new-list-name" placeholder="Name der neuen Liste" />
+          </div>
+          <button class="btn btn-ghost btn-full" id="new-list-btn">+ Liste erstellen</button>
+        </div>
+        <div class="card" id="list-detail">
+          <div class="empty-state"><div class="glyph">&#9670;</div>Wähle oder erstelle eine Liste, um zu beginnen.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TODOS (personal, per person) -->
+    <section class="panel" id="panel-todos">
+      <div class="todo-head">
+        <p class="section-title" style="margin:0;">Meine Aufgaben</p>
+        <div class="todo-progress-wrap" id="todo-progress-wrap">
+          <div class="todo-progress-bar"><div class="todo-progress-fill" id="todo-progress-fill"></div></div>
+          <span id="todo-progress-label">0/0 erledigt</span>
+        </div>
+      </div>
+      <div class="card">
+        <div id="todo-items"></div>
+        <div class="todo-add-row">
+          <input id="new-todo-text" placeholder="Aufgabe hinzufügen …" />
+          <input id="new-todo-due" type="date" title="Fällig am (optional)" />
+          <button class="btn" id="new-todo-add">+ Hinzufügen</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- MESSAGES -->
+    <section class="panel" id="panel-messages">
+      <div id="msg-list-view">
+        <p class="section-title" style="margin-bottom:18px;">Nachrichten</p>
+        <div id="msg-conversation-list"></div>
+      </div>
+      <div id="msg-thread-view" class="hidden">
+        <div class="thread-header">
+          <button class="icon-btn" id="msg-back">&#8592;</button>
+          <h3 id="msg-thread-title"></h3>
+        </div>
+        <div class="card">
+          <div id="chat-messages" class="chat-messages"></div>
+          <div id="attachment-preview" class="attachment-preview hidden"></div>
+          <div class="chat-input-row">
+            <button class="icon-btn" id="attach-btn" title="Bild oder Dokument anhängen">&#128206;</button>
+            <input id="chat-input" placeholder="Nachricht schreiben …" />
+            <button class="btn" id="chat-send">Senden</button>
+          </div>
+          <input type="file" id="attach-input" accept="image/*,.pdf,.doc,.docx,.pages,.txt,.xlsx,.csv" class="hidden" />
+        </div>
+      </div>
+    </section>
+
+    <!-- MOOD -->
+    <section class="panel" id="panel-mood">
+      <p class="section-title" id="mood-heading">Stimmung der Eltern</p>
+      <div class="grid-2" id="mood-wrap"></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="panel" id="panel-settings">
+      <div class="grid-2">
+        <div class="card">
+          <p class="section-title">Erscheinungsbild</p>
+          <p style="margin:0 0 8px; font-size:.85rem; color:var(--text-dim);">Akzentfarbe</p>
+          <div class="swatch-row" id="swatch-row"></div>
+          <div class="toggle-row">
+            <span>Dunkler Modus</span>
+            <div class="switch" id="mode-switch"></div>
+          </div>
+        </div>
+        <div class="card">
+          <p class="section-title">Passwort ändern</p>
+          <div class="field"><label>Aktuelles Passwort</label><input type="password" id="cur-pw" /></div>
+          <div class="field"><label>Neues Passwort</label><input type="password" id="new-pw" /></div>
+          <div class="field"><label>Neues Passwort bestätigen</label><input type="password" id="new-pw2" /></div>
+          <div class="error-text" id="pw-change-error"></div>
+          <button class="btn btn-full" id="pw-change-btn">Passwort aktualisieren</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+/* =========================================================
+   FAMILY HUB — app logic
+   Fill in firebaseConfig below with your own project's keys.
+   See SETUP.md for full instructions.
+========================================================= */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
+  getAuth, signInAnonymously
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc,
+  onSnapshot, query, deleteDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+// Note: no Firebase Storage import — attachments are embedded directly as
+// compressed base64 inside the Firestore message document instead, so this
+// stays fully on the free Spark plan (Storage requires the paid Blaze plan).
+
+// ---------- OneSignal push: what you need & where to get it ----------
+// APP_ID  — public, safe to leave in this file. OneSignal dashboard → your
+//           app → Settings → Keys & IDs → "OneSignal App ID".
+// The REST API Key is NOT needed here and must never go in this file — it
+// lives only inside the Cloudflare Worker proxy (see push-proxy-worker.js
+// and the setup notes) as a secret, because anyone can view this page's
+// source.
+const ONESIGNAL_APP_ID = "f32f009b-7215-4ab0-ac82-e6781cec15ae";
+// Paste the URL you get after deploying push-proxy-worker.js to Cloudflare
+// (looks like "https://familien-hub-push.YOURNAME.workers.dev"). Leave
+// empty to disable outbound push — everything else keeps working, you just
+// won't get notifications while the app is fully closed.
+const PUSH_PROXY_URL = "https://family-hub-push.frederick-schroedenberg.workers.dev/";
+// A password only your app and your Worker know, so a stranger who guesses
+// the Worker URL can't use it to spam your family with pushes. Make up any
+// string, put the SAME string in the Worker's PROXY_SHARED_SECRET variable.
+const PUSH_PROXY_SECRET = "family.scheitza";
+
+// ---------- 1. YOUR FIREBASE CONFIG (see SETUP.md) ----------
+const firebaseConfig = {
+  apiKey: "AIzaSyD9K5zVjljEELNNFLo3WHoJC4yIHLoJMh0",
+  authDomain: "family-hub-1fd4d.firebaseapp.com",
+  projectId: "family-hub-1fd4d",
+  storageBucket: "family-hub-1fd4d.firebasestorage.app",
+  messagingSenderId: "548933673001",
+  appId: "1:548933673001:web:1e5491c579e65d3ec27c38"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ---------- 2. Family roster & default passwords ----------
+// Change these defaults any time from the Settings tab once logged in.
+const FAMILY = [
+  { id:"matthias", name:"Matthias", role:"Papa",    isParent:true,  initials:"M", defaultPassword:"Falke-77-Dad" },
+  { id:"susanne",  name:"Susanne",  role:"Mama",    isParent:true,  initials:"S", defaultPassword:"Rose-42-Mom" },
+  { id:"philipp",  name:"Philipp",  role:"Familie", isParent:false, initials:"P", defaultPassword:"Loewe-19" },
+  { id:"jakob",    name:"Jakob",    role:"Familie", isParent:false, initials:"J", defaultPassword:"Adler-23" },
+  { id:"helena",   name:"Helena",   role:"Familie", isParent:false, initials:"H", defaultPassword:"Stern-08" },
+];
+const ACCENTS = ["#C9A24B","#7C93C7","#B5533C","#4F8C6A","#9B6FB0","#D68A3E"];
+
+// ---------- Messaging: groups & DM helpers ----------
+const GROUPS = [
+  { id:"group_all", name:"Alle", icon:"👪", members: FAMILY.map(f=>f.id) },
+  { id:"group_all_except_papa", name:"Alle außer Papa", icon:"🙈", members: FAMILY.filter(f=>f.id!=="matthias").map(f=>f.id) },
+  { id:"group_kids", name:"Kinder", icon:"🧒", members: FAMILY.filter(f=>!f.isParent).map(f=>f.id) },
+];
+function dmId(a, b){ return "dm_" + [a,b].sort().join("_"); }
+function conversationMembers(conversationId){
+  const g = GROUPS.find(g=>g.id===conversationId);
+  if (g) return g.members;
+  if (conversationId.startsWith("dm_")) return conversationId.slice(3).split("_");
+  return [];
+}
+function conversationLabel(conversationId, forUserId){
+  const g = GROUPS.find(g=>g.id===conversationId);
+  if (g) return g.name;
+  if (conversationId.startsWith("dm_")){
+    const ids = conversationId.slice(3).split("_");
+    const otherId = ids.find(id=>id!==forUserId) || ids[0];
+    return FAMILY.find(f=>f.id===otherId)?.name || otherId;
+  }
+  return conversationId;
+}
+function conversationsForUser(userId){
+  const dms = FAMILY.filter(f=>f.id!==userId).map(f=>dmId(userId,f.id));
+  const groups = GROUPS.filter(g=>g.members.includes(userId)).map(g=>g.id);
+  return [...groups, ...dms];
+}
+
+let currentUser = null;   // full user doc + id
+let pendingLogin = null;  // family member being password-checked
+let usersCache = {};      // id -> user doc data
+let calMonth = new Date(); calMonth.setDate(1);
+let selectedDay = null;   // "YYYY-MM-DD"
+let eventsCache = [];
+let listsCache = [];
+let activeListId = null;
+let todosCache = [];
+let messagesCache = [];       // all messages across all conversations this user can see
+let activeConversationId = null;
+let pendingAttachment = null; // { file, previewUrl } staged before sending
+let notificationsEnabled = false;
+let lastSeenLists = null;   // id -> JSON snapshot, to detect changes by others
+let lastSeenMessageCount = {}; // conversationId -> count, to detect new messages
+let messagesBooted = false;
+const LOGIN_STORAGE_KEY = "familyhub_currentUserId";
+
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+function hexToRgbObj(hex){
+  hex = (hex||"#C9A24B").replace("#","");
+  if (hex.length===3) hex = hex.split("").map(c=>c+c).join("");
+  const num = parseInt(hex,16);
+  return { r:(num>>16)&255, g:(num>>8)&255, b:num&255 };
+}
+function applyAccent(color){
+  if (!color) return;
+  document.documentElement.style.setProperty("--accent", color);
+  const { r, g, b } = hexToRgbObj(color);
+  const mix = (c)=> Math.round(c + (255-c)*0.45);
+  document.documentElement.style.setProperty("--accent-soft", `rgb(${mix(r)},${mix(g)},${mix(b)})`);
+}
+
+// =========================================================
+// PARTICLE BACKGROUND — drifting gold dust, mouse-reactive
+// =========================================================
+(function initParticles(){
+  const canvas = document.getElementById("bg-particles");
+  const ctx = canvas.getContext("2d");
+  let w, h, particles = [];
+  const mouse = { x:-9999, y:-9999 };
+  const COUNT = window.innerWidth < 700 ? 45 : 90;
+
+  function resize(){
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  window.addEventListener("resize", resize);
+  resize();
+
+  function accentColor(){
+    return getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#C9A24B";
+  }
+  function hexToRgb(hex){
+    hex = hex.replace("#","");
+    if (hex.length===3) hex = hex.split("").map(c=>c+c).join("");
+    const num = parseInt(hex,16);
+    return { r:(num>>16)&255, g:(num>>8)&255, b:num&255 };
+  }
+
+  class Particle {
+    constructor(){ this.reset(true); }
+    reset(initial){
+      this.x = Math.random()*w;
+      this.y = initial ? Math.random()*h : h + 10;
+      this.r = Math.random()*1.8 + 0.6;
+      this.baseVx = (Math.random()-0.5)*0.15;
+      this.vy = -(Math.random()*0.25 + 0.08);
+      this.alpha = Math.random()*0.5 + 0.25;
+      this.twinkleSpeed = Math.random()*0.02 + 0.005;
+      this.twinklePhase = Math.random()*Math.PI*2;
+    }
+    update(){
+      this.twinklePhase += this.twinkleSpeed;
+      let vx = this.baseVx;
+      const dx = this.x - mouse.x, dy = this.y - mouse.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 110){
+        const force = (110 - dist) / 110;
+        vx += (dx/dist) * force * 0.6;
+        this.y += (dy/dist) * force * 0.6;
+      }
+      this.x += vx;
+      this.y += this.vy;
+      if (this.y < -10 || this.x < -20 || this.x > w+20) this.reset(false);
+    }
+    draw(rgb){
+      const a = this.alpha * (0.55 + 0.45*Math.sin(this.twinklePhase));
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${a})`;
+      ctx.shadowColor = `rgba(${rgb.r},${rgb.g},${rgb.b},${a})`;
+      ctx.shadowBlur = 6;
+      ctx.fill();
+    }
+  }
+
+  for (let i=0;i<COUNT;i++) particles.push(new Particle());
+
+  window.addEventListener("mousemove", e=>{ mouse.x = e.clientX; mouse.y = e.clientY; });
+  window.addEventListener("mouseleave", ()=>{ mouse.x = -9999; mouse.y = -9999; });
+  window.addEventListener("touchmove", e=>{
+    if (e.touches[0]){ mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY; }
+  }, { passive:true });
+
+  function loop(){
+    ctx.clearRect(0,0,w,h);
+    const rgb = hexToRgb(accentColor());
+    particles.forEach(p=>{ p.update(); p.draw(rgb); });
+    ctx.shadowBlur = 0;
+    requestAnimationFrame(loop);
+  }
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!reduceMotion) loop();
+})();
+
+// =========================================================
+// RIPPLE — gold ripple on click for buttons/chips/etc.
+// =========================================================
+document.addEventListener("click", (e)=>{
+  const target = e.target.closest(".btn, .icon-btn, .chip, .swatch, .list-nav-item, .nav-item, .nav-trigger");
+  if (!target) return;
+  const rect = target.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height) * 1.4;
+  const span = document.createElement("span");
+  span.className = "ripple";
+  span.style.width = span.style.height = size + "px";
+  span.style.left = (e.clientX - rect.left - size/2) + "px";
+  span.style.top = (e.clientY - rect.top - size/2) + "px";
+  target.appendChild(span);
+  span.addEventListener("animationend", ()=> span.remove());
+});
+
+// =========================================================
+// CREST 3D TILT + SHIMMER (login screen)
+// =========================================================
+function attachCrestEffects(){
+  $$(".crest").forEach(card=>{
+    card.addEventListener("mousemove", (e)=>{
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left, y = e.clientY - rect.top;
+      const cx = rect.width/2, cy = rect.height/2;
+      const rotY = ((x - cx)/cx) * 9;
+      const rotX = -((y - cy)/cy) * 9;
+      card.style.transform = `perspective(700px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-6px)`;
+    });
+    card.addEventListener("mouseenter", ()=>{
+      card.classList.remove("sweep");
+      void card.offsetWidth;
+      card.classList.add("sweep");
+    });
+    card.addEventListener("mouseleave", ()=>{
+      card.style.transform = "";
+    });
+  });
+}
+
+function toast(msg){
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2200);
+}
+
+// ---------- Auth (anonymous, shared for whole family DB) ----------
+// IMPORTANT: seeding must wait until sign-in has actually completed,
+// otherwise Firestore rejects the writes and no accounts get created.
+const authReady = signInAnonymously(auth).catch(err=>{
+  console.error(err);
+  toast("Verbindung zur Datenbank fehlgeschlagen. firebaseConfig in index.html prüfen.");
+  throw err;
+});
+
+// ---------- Seed default users if they don't exist yet ----------
+async function ensureSeeded(){
+  for (const f of FAMILY){
+    const ref = doc(db, "users", f.id);
+    const snap = await getDoc(ref);
+    if (!snap.exists()){
+      await setDoc(ref, {
+        name: f.name,
+        role: f.role,
+        isParent: f.isParent,
+        password: f.defaultPassword,
+        accent: "#C9A24B",
+        darkMode: true,
+        mood: 5
+      });
+    }
+  }
+}
+
+// ---------- Build login crest grid ----------
+function buildCrestGrid(){
+  const grid = $("#crest-grid");
+  grid.innerHTML = "";
+  FAMILY.forEach(f=>{
+    const el = document.createElement("div");
+    el.className = "crest";
+    el.innerHTML = `
+      <div class="shield">${f.initials}</div>
+      <div class="name">${f.name}</div>
+      <div class="role">${f.role}</div>
+    `;
+    el.addEventListener("click", ()=> openPasswordModal(f));
+    grid.appendChild(el);
+  });
+  attachCrestEffects();
+}
+
+function openPasswordModal(member){
+  pendingLogin = member;
+  $("#modal-initial").textContent = member.initials;
+  $("#modal-name").textContent = member.name;
+  $("#pw-input").value = "";
+  $("#pw-error").textContent = "";
+  $("#password-modal").classList.remove("hidden");
+  setTimeout(()=>$("#pw-input").focus(), 50);
+}
+$("#pw-cancel").addEventListener("click", ()=> $("#password-modal").classList.add("hidden"));
+$("#pw-input").addEventListener("keydown", e=>{ if(e.key==="Enter") attemptLogin(); });
+$("#pw-submit").addEventListener("click", attemptLogin);
+
+async function attemptLogin(){
+  if (!pendingLogin) return;
+  const entered = $("#pw-input").value;
+  const ref = doc(db, "users", pendingLogin.id);
+  const snap = await getDoc(ref);
+  if (!snap.exists()){
+    $("#pw-error").textContent = "Konto noch nicht eingerichtet — bitte gleich nochmal versuchen.";
+    return;
+  }
+  const data = snap.data();
+  if (entered !== data.password){
+    $("#pw-error").textContent = "Falsches Passwort.";
+    return;
+  }
+  currentUser = { id: pendingLogin.id, ...data, ...FAMILY.find(f=>f.id===pendingLogin.id) , ...data};
+  try { localStorage.setItem(LOGIN_STORAGE_KEY, currentUser.id); } catch(e){}
+  $("#password-modal").classList.add("hidden");
+  enterApp();
+}
+
+// ---------- Auto-login: stay signed in on this device until explicit logout ----------
+async function tryAutoLogin(){
+  let savedId = null;
+  try { savedId = localStorage.getItem(LOGIN_STORAGE_KEY); } catch(e){}
+  if (!savedId) return false;
+  const member = FAMILY.find(f=>f.id===savedId);
+  if (!member) return false;
+  const snap = await getDoc(doc(db,"users",savedId));
+  if (!snap.exists()) return false;
+  currentUser = { id: savedId, ...snap.data(), ...member, ...snap.data() };
+  enterApp();
+  return true;
+}
+
+// ---------- Enter app ----------
+function enterApp(){
+  document.documentElement.setAttribute("data-theme", currentUser.darkMode ? "dark" : "light");
+  applyAccent(currentUser.accent || "#C9A24B");
+
+  $("#login-screen").classList.add("hidden");
+  $("#app").classList.add("active");
+
+  $("#tb-avatar").textContent = currentUser.initials;
+  $("#tb-name").textContent = currentUser.name;
+  $("#tb-role").textContent = currentUser.role;
+
+  buildTabs();
+  subscribeUsers();
+  subscribeEvents();
+  subscribeLists();
+  subscribeTodos();
+  subscribeMessages();
+  if (!currentUser.isParent) subscribeParentBond();
+  requestNotificationPermission();
+  linkOneSignalIdentity(currentUser.id);
+  renderHome();
+  renderCalendar();
+  renderSettings();
+  loadWeather();
+}
+
+const NAV_ICONS = {
+  home: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11.5 12 4l8.5 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1H10v-5.5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1V20h3.5a1 1 0 0 0 1-1v-9"/></svg>`,
+  calendar: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5.5" width="16" height="15" rx="2.2"/><path d="M8 3.5v4M16 3.5v4M4 10h16"/><circle cx="9" cy="14.2" r="1" fill="currentColor" stroke="none"/><circle cx="13" cy="14.2" r="1" fill="currentColor" stroke="none"/><circle cx="9" cy="17.4" r="1" fill="currentColor" stroke="none"/></svg>`,
+  lists: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 6.5h1.6M5 12h1.6M5 17.5h1.6"/><path d="M9.5 6.5H19M9.5 12H19M9.5 17.5H19"/></svg>`,
+  todos: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="4.5" width="15" height="15" rx="3.2"/><path d="m8.3 12.3 2.4 2.4 5-5"/></svg>`,
+  messages: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.8a2.3 2.3 0 0 1 2.3-2.3h10.4a2.3 2.3 0 0 1 2.3 2.3v7.2a2.3 2.3 0 0 1-2.3 2.3H10l-4 3.4v-3.4H6.8a2.3 2.3 0 0 1-2.3-2.3z"/></svg>`,
+  mood: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.2s-7.2-4.5-9.3-9.2C1.4 7.7 3 4.6 6.1 4.1c2-.3 3.6.7 5.9 3 2.3-2.3 3.9-3.3 5.9-3 3.1.5 4.7 3.6 3.4 6.9-2.1 4.7-9.3 9.2-9.3 9.2Z"/></svg>`,
+  settings: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.1"/><path d="M12 3.5v2.3M12 18.2v2.3M20.5 12h-2.3M5.8 12H3.5M17.7 6.3l-1.6 1.6M7.9 16.1l-1.6 1.6M17.7 17.7l-1.6-1.6M7.9 7.9 6.3 6.3"/></svg>`,
+};
+
+function navDestinations(){
+  const tabs = [
+    { id:"home", label:"Start" },
+    { id:"calendar", label:"Kalender" },
+    { id:"lists", label:"Listen" },
+    { id:"todos", label:"Aufgaben" },
+    { id:"messages", label:"Nachrichten" },
+  ];
+  // Mood tab: Papa never has it. Mama only sees/sets Papa's mood.
+  // Kids only see/set how Mama & Papa are getting along — never Papa or Mama individually,
+  // and neither parent can see this at all.
+  if (currentUser.id === "susanne"){
+    tabs.push({ id:"mood", label:"Papas Stimmung" });
+  } else if (!currentUser.isParent){
+    tabs.push({ id:"mood", label:"Mama & Papa" });
+  }
+  tabs.push({ id:"settings", label:"Einstellungen" });
+  return tabs;
+}
+
+let activeTabId = "home";
+
+function buildTabs(){
+  renderNavDropdown();
+  switchTab("home");
+}
+
+function renderNavDropdown(){
+  const dd = $("#nav-dropdown");
+  const tabs = navDestinations();
+  dd.innerHTML = "";
+  tabs.forEach((t,i)=>{
+    const btn = document.createElement("button");
+    btn.className = "nav-item" + (t.id===activeTabId ? " active" : "");
+    btn.dataset.tab = t.id;
+    btn.style.animationDelay = (i*0.035)+"s";
+    const unread = t.id==="messages" ? totalUnreadMessages() : 0;
+    btn.innerHTML = `<span class="ico">${NAV_ICONS[t.id]||"•"}</span><span>${t.label}</span>${unread ? `<span class="badge">${unread}</span>` : ""}`;
+    btn.addEventListener("click", ()=>{ switchTab(t.id); closeNavDropdown(); });
+    dd.appendChild(btn);
+  });
+}
+
+function switchTab(id){
+  activeTabId = id;
+  const tabs = navDestinations();
+  const t = tabs.find(x=>x.id===id) || tabs[0];
+  $("#nav-trigger-icon").innerHTML = NAV_ICONS[t.id] || "•";
+  $("#nav-trigger-label").textContent = t.label;
+  $$(".nav-item").forEach(b=> b.classList.toggle("active", b.dataset.tab===id));
+  $$(".panel").forEach(p=> p.classList.remove("active"));
+  $("#panel-"+id)?.classList.add("active");
+  if (id==="mood") renderMood();
+  if (id==="lists") renderListNav();
+  if (id==="todos") renderTodos();
+  if (id==="messages") renderMessages();
+}
+
+function closeNavDropdown(){
+  $("#nav-dropdown").classList.remove("open");
+  $("#nav-trigger").classList.remove("open");
+}
+$("#nav-trigger").addEventListener("click", (e)=>{
+  e.stopPropagation();
+  const open = $("#nav-dropdown").classList.toggle("open");
+  $("#nav-trigger").classList.toggle("open", open);
+  if (open) renderNavDropdown();
+});
+document.addEventListener("click", (e)=>{
+  if (!e.target.closest(".nav-bar")) closeNavDropdown();
+});
+
+$("#theme-toggle").addEventListener("click", async ()=>{
+  const dark = document.documentElement.getAttribute("data-theme") !== "dark";
+  document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+  currentUser.darkMode = dark;
+  await updateDoc(doc(db,"users",currentUser.id), { darkMode: dark });
+  renderSettings();
+});
+
+$("#logout-btn").addEventListener("click", ()=>{
+  try { localStorage.removeItem(LOGIN_STORAGE_KEY); } catch(e){}
+  if (window.OneSignalDeferred){
+    window.OneSignalDeferred.push(async function(OneSignal){
+      try { await OneSignal.logout(); } catch(e){}
+    });
+  }
+  currentUser = null;
+  $("#app").classList.remove("active");
+  $("#login-screen").classList.remove("hidden");
+});
+
+// ---------- Live users (for mood + visibility names) ----------
+function subscribeUsers(){
+  FAMILY.forEach(f=>{
+    onSnapshot(doc(db,"users",f.id), snap=>{
+      if (snap.exists()){
+        usersCache[f.id] = { id:f.id, ...FAMILY.find(x=>x.id===f.id), ...snap.data() };
+        if (currentUser && currentUser.id===f.id){
+          currentUser = { ...currentUser, ...snap.data() };
+        }
+        renderMood();
+        renderHome();
+      }
+    });
+  });
+}
+
+// =========================================================
+// HOME
+// =========================================================
+function renderHome(){
+  if (!currentUser) return;
+  $("#home-hello").textContent = `Willkommen zurück, ${currentUser.name}`;
+  $("#home-date").textContent = new Date().toLocaleDateString("de-DE", { weekday:"long", year:"numeric", month:"long", day:"numeric" });
+
+  const visibleEvents = eventsCache.filter(canSee).sort((a,b)=> (a.date+a.time) > (b.date+b.time) ? 1 : -1);
+  const upcoming = visibleEvents.filter(e=> e.date >= todayISO()).slice(0,4);
+  const myTasks = getMyTasks();
+  const unread = totalUnreadMessages();
+
+  $("#home-stats").innerHTML = `
+    <div class="stat"><div class="num">${upcoming.length}</div><div class="lbl">Anstehende Termine</div></div>
+    <div class="stat"><div class="num">${myTasks.length}</div><div class="lbl">Offene Aufgaben</div></div>
+    <div class="stat"><div class="num">${unread}</div><div class="lbl">Neue Nachrichten</div></div>
+  `;
+
+  // ---- Quick access tiles: from Home you can reach everything ----
+  const quickWrap = $("#home-quick-grid");
+  const tiles = navDestinations().filter(t=>t.id!=="home");
+  quickWrap.innerHTML = "";
+  tiles.forEach(t=>{
+    const badge = t.id==="messages" ? unread : 0;
+    const tile = document.createElement("div");
+    tile.className = "quick-tile";
+    tile.innerHTML = `${badge ? `<span class="badge">${badge}</span>` : ""}<span class="ico">${NAV_ICONS[t.id]||"•"}</span><span class="lbl">${t.label}</span>`;
+    tile.addEventListener("click", ()=> switchTab(t.id));
+    quickWrap.appendChild(tile);
+  });
+
+  const upWrap = $("#home-upcoming");
+  upWrap.innerHTML = upcoming.length ? "" : `<div class="empty-state">Noch keine anstehenden Termine.</div>`;
+  upcoming.forEach(e=>{
+    const div = document.createElement("div");
+    div.className = "event-item";
+    div.innerHTML = `<div>
+      <div class="t">${escapeHtml(e.title)}</div>
+      <div class="d">${formatDate(e.date)}${e.time ? " · "+e.time : ""}</div>
+    </div>`;
+    upWrap.appendChild(div);
+  });
+
+  const taskWrap = $("#home-tasks");
+  taskWrap.innerHTML = myTasks.length ? "" : `<div class="empty-state">Nichts offen.</div>`;
+  myTasks.slice(0,5).forEach(t=>{
+    const div = document.createElement("div");
+    div.className = "event-item";
+    div.innerHTML = `<div><div class="t">${escapeHtml(t.text)}</div><div class="d">${escapeHtml(t.source)}</div></div>`;
+    taskWrap.appendChild(div);
+  });
+
+  // ---- Latest messages preview ----
+  const msgWrap = $("#home-messages");
+  if (msgWrap){
+    const myConvos = conversationsForUser(currentUser.id);
+    const recent = messagesCache.filter(m=>myConvos.includes(m.conversationId)).slice(-4).reverse();
+    msgWrap.innerHTML = recent.length ? "" : `<div class="empty-state">Noch keine Nachrichten.</div>`;
+    recent.forEach(m=>{
+      const div = document.createElement("div");
+      div.className = "home-msg-preview";
+      const senderName = m.sender===currentUser.id ? "Du" : (usersCache[m.sender]?.name || m.sender);
+      const preview = m.attachmentUrl ? (m.attachmentType==="image" ? "📷 Bild" : "📎 Datei") : m.text;
+      div.innerHTML = `<div class="t">${escapeHtml(senderName)} · ${escapeHtml(conversationLabel(m.conversationId, currentUser.id))}</div><div class="d">${escapeHtml(preview||"")}</div>`;
+      div.style.cursor = "pointer";
+      div.addEventListener("click", ()=>{ switchTab("messages"); openConversation(m.conversationId); });
+      msgWrap.appendChild(div);
+    });
+  }
+
+  // ---- My lists preview ----
+  const listsWrap = $("#home-lists");
+  if (listsWrap){
+    const myLists = listsCache.filter(canSee).slice(0,4);
+    listsWrap.innerHTML = myLists.length ? "" : `<div class="empty-state">Noch keine Listen.</div>`;
+    myLists.forEach(l=>{
+      const doneCount = (l.items||[]).filter(i=>i.done).length;
+      const div = document.createElement("div");
+      div.className = "home-msg-preview";
+      div.style.cursor = "pointer";
+      div.innerHTML = `<div class="t">${escapeHtml(l.name)}</div><div class="d">${doneCount}/${(l.items||[]).length} erledigt</div>`;
+      div.addEventListener("click", ()=>{ switchTab("lists"); activeListId = l.id; renderListNav(); renderListDetail(); });
+      listsWrap.appendChild(div);
+    });
+  }
+}
+
+$$(".link-btn[data-goto]").forEach(b=>{
+  b.addEventListener("click", ()=> switchTab(b.dataset.goto));
+});
+document.addEventListener("click", (e)=>{
+  const btn = e.target.closest(".link-btn[data-goto]");
+  if (btn) switchTab(btn.dataset.goto);
+});
+
+// Personal task list shown on Home + the Aufgaben tab:
+// own personal todos, plus any list items someone assigned to this person.
+function getMyTasks(){
+  if (!currentUser) return [];
+  const mine = todosCache
+    .filter(t=> t.owner===currentUser.id && !t.done)
+    .map(t=> ({ id:t.id, text:t.text, source:"Persönlich", kind:"todo" }));
+  const assigned = [];
+  listsCache.forEach(l=>{
+    (l.items||[]).forEach((it, idx)=>{
+      if (!it.done && it.assignedTo===currentUser.id){
+        assigned.push({ id:l.id+"-"+idx, text:it.text, source:l.name, kind:"list" });
+      }
+    });
+  });
+  return [...mine, ...assigned];
+}
+
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function formatDate(iso){
+  const d = new Date(iso+"T00:00:00");
+  return d.toLocaleDateString("de-DE",{ weekday:"short", month:"short", day:"numeric" });
+}
+function escapeHtml(s){ return (s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+function canSee(item){
+  if (!currentUser) return false;
+  if (item.owner === currentUser.id) return true;
+  return (item.visibleTo||[]).includes(currentUser.id);
+}
+
+// =========================================================
+// CALENDAR
+// =========================================================
+function subscribeEvents(){
+  onSnapshot(collection(db,"events"), snap=>{
+    eventsCache = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+    renderCalendar();
+    renderHome();
+  });
+}
+
+function buildEvVisibleChips(){
+  const wrap = $("#ev-visible");
+  wrap.innerHTML = "";
+  FAMILY.filter(f=>f.id!==currentUser.id).forEach(f=>{
+    const c = document.createElement("div");
+    c.className = "chip on"; // family calendar: visible to everyone by default
+    c.textContent = f.name;
+    c.dataset.id = f.id;
+    c.addEventListener("click", ()=> c.classList.toggle("on"));
+    wrap.appendChild(c);
+  });
+}
+
+function renderCalendar(){
+  if (!currentUser) return;
+  buildEvVisibleChips();
+  const y = calMonth.getFullYear(), m = calMonth.getMonth();
+  $("#cal-title").textContent = calMonth.toLocaleDateString("de-DE",{month:"long", year:"numeric"});
+
+  const dowRow = $("#cal-dow-row");
+  dowRow.innerHTML = "";
+  ["So","Mo","Di","Mi","Do","Fr","Sa"].forEach(d=>{
+    const el = document.createElement("div"); el.className="cal-dow"; el.textContent=d; dowRow.appendChild(el);
+  });
+
+  const grid = $("#cal-grid");
+  grid.innerHTML = "";
+  const firstDow = new Date(y,m,1).getDay();
+  const daysInMonth = new Date(y,m+1,0).getDate();
+  const visibleEvents = eventsCache.filter(canSee);
+
+  for (let i=0;i<firstDow;i++){
+    const e = document.createElement("div"); e.className="cal-day empty"; grid.appendChild(e);
+  }
+  for (let day=1; day<=daysInMonth; day++){
+    const iso = `${y}-${String(m+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+    const cell = document.createElement("div");
+    cell.className = "cal-day";
+    if (iso === todayISO()) cell.classList.add("today");
+    if (iso === selectedDay) cell.classList.add("selected");
+    const has = visibleEvents.some(e=> e.date===iso);
+    cell.innerHTML = `${day}` + (has ? `<div class="cal-dot"></div>` : "");
+    cell.addEventListener("click", ()=>{ selectedDay = iso; $("#ev-date").value = iso; renderCalendar(); renderDayEvents(); });
+    grid.appendChild(cell);
+  }
+  if (!selectedDay) selectedDay = todayISO();
+  $("#ev-date").value = $("#ev-date").value || selectedDay;
+  renderDayEvents();
+}
+
+function renderDayEvents(){
+  const label = selectedDay ? formatDate(selectedDay) : "Events";
+  $("#cal-day-label").textContent = "Termine — " + label;
+  const list = eventsCache.filter(canSee).filter(e=> e.date === selectedDay).sort((a,b)=> (a.time||"") > (b.time||"") ? 1 : -1);
+  const wrap = $("#cal-day-events");
+  wrap.innerHTML = list.length ? "" : `<div class="empty-state">Keine Termine an diesem Tag.</div>`;
+  list.forEach(e=>{
+    const owner = usersCache[e.owner]?.name || e.owner;
+    const div = document.createElement("div");
+    div.className = "event-item";
+    div.innerHTML = `
+      <div>
+        <div class="t">${escapeHtml(e.title)}</div>
+        <div class="d">${e.time ? e.time+" · " : ""}${escapeHtml(e.notes||"")}</div>
+        <div class="who">Hinzugefügt von ${escapeHtml(owner)}</div>
+      </div>
+      ${e.owner===currentUser.id ? `<button class="x-btn" data-del="${e.id}">&#10005;</button>` : ""}
+    `;
+    wrap.appendChild(div);
+  });
+  wrap.querySelectorAll("[data-del]").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      await deleteDoc(doc(db,"events",btn.dataset.del));
+      toast("Termin entfernt.");
+    });
+  });
+}
+
+$("#cal-prev").addEventListener("click", ()=>{ calMonth.setMonth(calMonth.getMonth()-1); renderCalendar(); });
+$("#cal-next").addEventListener("click", ()=>{ calMonth.setMonth(calMonth.getMonth()+1); renderCalendar(); });
+
+$("#ev-add").addEventListener("click", async ()=>{
+  const title = $("#ev-title").value.trim();
+  const date = $("#ev-date").value;
+  if (!title || !date){ toast("Bitte Titel und Datum angeben."); return; }
+  const time = $("#ev-time").value || "";
+  const visibleTo = $$("#ev-visible .chip.on").map(c=>c.dataset.id);
+  await addDoc(collection(db,"events"), {
+    title, date,
+    time,
+    notes: $("#ev-notes").value.trim(),
+    owner: currentUser.id,
+    visibleTo,
+    createdAt: serverTimestamp()
+  });
+
+  // Immediate push — only to people who can actually see this event.
+  const immediateAudience = dedupe(visibleTo).filter(id=>id!==currentUser.id);
+  sendPush(immediateAudience, "Neuer Termin", `${currentUser.name}: ${title}${date ? " · "+formatDate(date) : ""}`);
+
+  // Reminder push 1h before — only possible if a clock time was given, and
+  // only scheduled if that moment is actually still in the future.
+  if (time){
+    const eventStart = new Date(`${date}T${time}:00`);
+    const reminderAt = new Date(eventStart.getTime() - 60*60*1000);
+    if (reminderAt.getTime() > Date.now()){
+      const audience = dedupe([currentUser.id, ...visibleTo]);
+      schedulePush(audience, "Termin in einer Stunde", `${title} · ${time}`, reminderAt.toISOString());
+    }
+  }
+
+  $("#ev-title").value=""; $("#ev-time").value=""; $("#ev-notes").value="";
+  $$("#ev-visible .chip").forEach(c=>c.classList.remove("on"));
+  toast("Termin hinzugefügt.");
+});
+
+// =========================================================
+// LISTS
+// =========================================================
+function subscribeLists(){
+  onSnapshot(collection(db,"lists"), snap=>{
+    const newLists = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+    checkListChangesForNotification(newLists);
+    listsCache = newLists;
+    renderListNav();
+    renderHome();
+    renderTodos();
+    if (activeListId) renderListDetail();
+  });
+}
+
+function renderListNav(){
+  if (!currentUser) return;
+  const wrap = $("#list-nav");
+  wrap.innerHTML = "";
+  const visible = listsCache.filter(canSee);
+  if (!visible.length){
+    wrap.innerHTML = `<div class="empty-state" style="padding:12px 0;">No lists yet.</div>`;
+  }
+  visible.forEach(l=>{
+    const el = document.createElement("div");
+    el.className = "list-nav-item" + (l.id===activeListId ? " active" : "");
+    const doneCount = (l.items||[]).filter(i=>i.done).length;
+    el.innerHTML = `<span>${escapeHtml(l.name)}</span><span style="font-size:.7rem;color:var(--text-dim);">${doneCount}/${(l.items||[]).length}</span>`;
+    el.addEventListener("click", ()=>{ activeListId = l.id; renderListNav(); renderListDetail(); });
+    wrap.appendChild(el);
+  });
+}
+
+$("#new-list-btn").addEventListener("click", async ()=>{
+  const name = $("#new-list-name").value.trim();
+  if (!name) return;
+  const ref = await addDoc(collection(db,"lists"), {
+    name, owner: currentUser.id, visibleTo: [], items: [], createdAt: serverTimestamp()
+  });
+  $("#new-list-name").value = "";
+  activeListId = ref.id;
+  toast("Liste erstellt.");
+});
+
+function renderListDetail(){
+  const list = listsCache.find(l=>l.id===activeListId);
+  const wrap = $("#list-detail");
+  if (!list || !canSee(list)){
+    wrap.innerHTML = `<div class="empty-state"><div class="glyph">&#9670;</div>Wähle oder erstelle eine Liste, um zu beginnen.</div>`;
+    return;
+  }
+  const isOwner = list.owner === currentUser.id;
+  const items = list.items || [];
+  wrap.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <h3 style="margin:0;">${escapeHtml(list.name)}</h3>
+      ${isOwner ? `<button class="btn-ghost btn" id="del-list" style="padding:6px 14px; font-size:.78rem;">Liste löschen</button>` : ""}
+    </div>
+    <div id="list-items"></div>
+    <div class="field" style="margin-top:14px;"><input id="new-item-text" placeholder="Eintrag hinzufügen und Enter drücken" /></div>
+    <div class="field">
+      <label>Zuweisen an (optional)</label>
+      <select id="new-item-assignee">
+        <option value="">Niemand</option>
+        ${FAMILY.map(f=>`<option value="${f.id}">${escapeHtml(f.name)}</option>`).join("")}
+      </select>
+    </div>
+    ${isOwner ? `<p class="section-title" style="margin-top:18px;">Sichtbar für</p><div class="chip-row" id="list-visible"></div>` : ""}
+  `;
+  const itemsWrap = $("#list-items");
+  if (!items.length) itemsWrap.innerHTML = `<div class="empty-state">Diese Liste ist leer.</div>`;
+  items.forEach((it, idx)=>{
+    const row = document.createElement("div");
+    row.className = "list-item" + (it.done ? " done" : "");
+    const assignee = it.assignedTo ? FAMILY.find(f=>f.id===it.assignedTo) : null;
+    row.innerHTML = `
+      <div class="check ${it.done?"done":""}" data-idx="${idx}">${it.done?"&#10003;":""}</div>
+      <div class="txt">${escapeHtml(it.text)}</div>
+      ${assignee ? `<span class="assign-tag">${escapeHtml(assignee.name)}</span>` : ""}
+      <button class="x-btn" data-rm="${idx}">&#10005;</button>
+    `;
+    itemsWrap.appendChild(row);
+  });
+  itemsWrap.querySelectorAll(".check").forEach(c=>{
+    c.addEventListener("click", async ()=>{
+      const idx = +c.dataset.idx;
+      const newItems = [...items];
+      newItems[idx] = { ...newItems[idx], done: !newItems[idx].done };
+      await updateDoc(doc(db,"lists",list.id), { items:newItems });
+    });
+  });
+  itemsWrap.querySelectorAll("[data-rm]").forEach(b=>{
+    b.addEventListener("click", async ()=>{
+      const idx = +b.dataset.rm;
+      const newItems = items.filter((_,i)=>i!==idx);
+      await updateDoc(doc(db,"lists",list.id), { items:newItems });
+    });
+  });
+  $("#new-item-text").addEventListener("keydown", async (e)=>{
+    if (e.key==="Enter" && e.target.value.trim()){
+      const assignedTo = $("#new-item-assignee").value || null;
+      const text = e.target.value.trim();
+      const newItems = [...items, { text, done:false, assignedTo }];
+      await updateDoc(doc(db,"lists",list.id), { items:newItems });
+      e.target.value="";
+      $("#new-item-assignee").value = "";
+
+      const audience = dedupe([list.owner, ...(list.visibleTo||[])]).filter(id=>id!==currentUser.id);
+      sendPush(audience, `„${list.name}“ aktualisiert`, `${currentUser.name}: ${text}`);
+    }
+  });
+  if (isOwner){
+    const vWrap = $("#list-visible");
+    FAMILY.filter(f=>f.id!==currentUser.id).forEach(f=>{
+      const c = document.createElement("div");
+      c.className = "chip" + ((list.visibleTo||[]).includes(f.id) ? " on" : "");
+      c.textContent = f.name;
+      c.addEventListener("click", async ()=>{
+        const set = new Set(list.visibleTo||[]);
+        const wasVisible = set.has(f.id);
+        wasVisible ? set.delete(f.id) : set.add(f.id);
+        await updateDoc(doc(db,"lists",list.id), { visibleTo:[...set] });
+        if (!wasVisible){
+          // Newly shared with f — only they get notified, nobody else.
+          sendPush([f.id], "Neue Liste geteilt", `${currentUser.name} hat „${list.name}“ mit dir geteilt.`);
+        }
+      });
+      vWrap.appendChild(c);
+    });
+    $("#del-list")?.addEventListener("click", async ()=>{
+      await deleteDoc(doc(db,"lists",list.id));
+      activeListId = null;
+      renderListDetail();
+      toast("Liste gelöscht.");
+    });
+  }
+}
+
+// =========================================================
+// TODOS (personal, per family member)
+// =========================================================
+function subscribeTodos(){
+  onSnapshot(collection(db,"todos"), snap=>{
+    todosCache = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+    renderTodos();
+    renderHome();
+  });
+}
+
+function renderTodos(){
+  if (!currentUser) return;
+  const wrap = $("#todo-items");
+  if (!wrap) return;
+  wrap.innerHTML = "";
+  const mine = todosCache.filter(t=> t.owner===currentUser.id)
+    .sort((a,b)=>{
+      if (!!a.done !== !!b.done) return a.done ? 1 : -1;
+      return (a.due||"9999") > (b.due||"9999") ? 1 : -1;
+    });
+  const assigned = [];
+  listsCache.forEach(l=>{
+    (l.items||[]).forEach((it, idx)=>{
+      if (it.assignedTo===currentUser.id){
+        assigned.push({ text:it.text, done:it.done, source:l.name, fromList:true, listId:l.id, idx });
+      }
+    });
+  });
+
+  const totalCount = mine.length + assigned.length;
+  const doneCount = mine.filter(t=>t.done).length + assigned.filter(a=>a.done).length;
+  const fill = $("#todo-progress-fill");
+  const label = $("#todo-progress-label");
+  if (fill && label){
+    fill.style.width = totalCount ? Math.round(doneCount/totalCount*100)+"%" : "0%";
+    label.textContent = `${doneCount}/${totalCount} erledigt`;
+  }
+
+  if (!mine.length && !assigned.length){
+    wrap.innerHTML = `<div class="empty-state"><div class="glyph">&#10003;</div>Noch keine Aufgaben — leg deine erste unten an.</div>`;
+    return;
+  }
+  const todayStr = todayISO();
+  mine.forEach(t=>{
+    const row = document.createElement("div");
+    row.className = "list-item" + (t.done ? " done" : "");
+    let dueHtml = "";
+    if (t.due){
+      const overdue = !t.done && t.due < todayStr;
+      dueHtml = `<div class="todo-meta"><span class="due-tag ${overdue?"overdue":""}">📅 ${formatDate(t.due)}</span></div>`;
+    }
+    row.innerHTML = `
+      <div class="check ${t.done?"done":""}" data-todo="${t.id}">${t.done?"&#10003;":""}</div>
+      <div class="txt-col">
+        <div class="txt">${escapeHtml(t.text)}</div>
+        ${dueHtml}
+      </div>
+      <button class="x-btn" data-todo-rm="${t.id}">&#10005;</button>
+    `;
+    wrap.appendChild(row);
+  });
+  assigned.forEach(a=>{
+    const row = document.createElement("div");
+    row.className = "list-item" + (a.done ? " done" : "");
+    row.innerHTML = `
+      <div class="check ${a.done?"done":""}" data-assign-toggle="${a.listId}:${a.idx}">${a.done?"&#10003;":""}</div>
+      <div class="txt-col">
+        <div class="txt">${escapeHtml(a.text)}</div>
+        <div class="todo-meta"><span class="assign-tag">${escapeHtml(a.source)}</span></div>
+      </div>
+    `;
+    wrap.appendChild(row);
+  });
+  wrap.querySelectorAll("[data-todo]").forEach(c=>{
+    c.addEventListener("click", async ()=>{
+      const t = todosCache.find(x=>x.id===c.dataset.todo);
+      await updateDoc(doc(db,"todos",c.dataset.todo), { done: !t.done });
+    });
+  });
+  wrap.querySelectorAll("[data-todo-rm]").forEach(b=>{
+    b.addEventListener("click", async ()=>{
+      await deleteDoc(doc(db,"todos",b.dataset.todoRm));
+    });
+  });
+  wrap.querySelectorAll("[data-assign-toggle]").forEach(c=>{
+    c.addEventListener("click", async ()=>{
+      const [listId, idxStr] = c.dataset.assignToggle.split(":");
+      const idx = +idxStr;
+      const list = listsCache.find(l=>l.id===listId);
+      if (!list) return;
+      const newItems = [...(list.items||[])];
+      newItems[idx] = { ...newItems[idx], done: !newItems[idx].done };
+      await updateDoc(doc(db,"lists",listId), { items:newItems });
+    });
+  });
+}
+
+async function addTodo(){
+  const input = $("#new-todo-text");
+  const dueInput = $("#new-todo-due");
+  const text = input.value.trim();
+  if (!text) return;
+  await addDoc(collection(db,"todos"), {
+    owner: currentUser.id, text, done:false, due: dueInput.value || null, createdAt: serverTimestamp()
+  });
+  input.value = "";
+  dueInput.value = "";
+}
+$("#new-todo-add")?.addEventListener("click", addTodo);
+$("#new-todo-text")?.addEventListener("keydown", e=>{ if (e.key==="Enter") addTodo(); });
+
+// =========================================================
+// ATTACHMENTS — no Firebase Storage (paid) involved: images are
+// downscaled/compressed client-side and embedded as base64 directly in the
+// Firestore message document. Firestore documents cap out at 1 MiB, so we
+// keep a safety margin and warn instead of silently failing.
+// =========================================================
+const MAX_ATTACHMENT_BYTES = 700 * 1024; // ~700 KB after base64 encoding
+
+function fileToDataUrl(file){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = ()=> resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Downscales + re-encodes an image as JPEG until it fits under the size cap.
+async function compressImage(file){
+  const dataUrl = await fileToDataUrl(file);
+  const img = await new Promise((resolve, reject)=>{
+    const i = new Image();
+    i.onload = ()=> resolve(i);
+    i.onerror = reject;
+    i.src = dataUrl;
+  });
+  let maxDim = 1280, quality = 0.75;
+  for (let attempt=0; attempt<6; attempt++){
+    const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(img.width * scale);
+    canvas.height = Math.round(img.height * scale);
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    const out = canvas.toDataURL("image/jpeg", quality);
+    if (out.length <= MAX_ATTACHMENT_BYTES || (maxDim <= 480 && quality <= 0.4)){
+      return out;
+    }
+    maxDim = Math.round(maxDim * 0.75);
+    quality = Math.max(0.4, quality - 0.15);
+  }
+  return null; // couldn't get it small enough
+}
+
+async function prepareAttachment(file){
+  const isImage = file.type.startsWith("image/");
+  if (isImage){
+    const dataUrl = await compressImage(file);
+    if (!dataUrl){
+      toast("Bild ist auch komprimiert zu groß — bitte ein kleineres Foto wählen.");
+      return null;
+    }
+    return { dataUrl, type:"image", name:file.name };
+  }
+  if (file.size > MAX_ATTACHMENT_BYTES){
+    toast(`Datei ist zu groß (max. ${Math.round(MAX_ATTACHMENT_BYTES/1024)} KB ohne Firebase Storage).`);
+    return null;
+  }
+  const dataUrl = await fileToDataUrl(file);
+  return { dataUrl, type:"file", name:file.name };
+}
+
+// =========================================================
+// MESSAGES — pick a recipient (person or group), attach files
+// =========================================================
+function subscribeMessages(){
+  onSnapshot(collection(db,"messages"), snap=>{
+    const prev = messagesCache;
+    const all = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+    const myConvos = conversationsForUser(currentUser.id);
+    messagesCache = all.filter(m=> myConvos.includes(m.conversationId))
+      .sort((a,b)=> (a.createdAtMs||0) - (b.createdAtMs||0));
+
+    if (!messagesBooted){
+      messagesBooted = true;
+      myConvos.forEach(cid=>{ lastSeenMessageCount[cid] = messagesCache.filter(m=>m.conversationId===cid).length; });
+    } else {
+      myConvos.forEach(cid=>{
+        const count = messagesCache.filter(m=>m.conversationId===cid).length;
+        const prevCount = lastSeenMessageCount[cid] ?? count;
+        if (count > prevCount && cid !== activeConversationId){
+          const newest = messagesCache.filter(m=>m.conversationId===cid).slice(-1)[0];
+          if (newest && newest.sender !== currentUser.id){
+            const senderName = usersCache[newest.sender]?.name || "Familie";
+            const preview = newest.attachmentUrl ? (newest.attachmentType==="image" ? "📷 Bild" : "📎 Datei") : newest.text;
+            notifyUser(`${senderName} · ${conversationLabel(cid, currentUser.id)}`, preview);
+          }
+        }
+        if (cid !== activeConversationId) lastSeenMessageCount[cid] = count;
+      });
+    }
+    renderMessages();
+    renderNavDropdown();
+  });
+}
+
+function totalUnreadMessages(){
+  if (!currentUser) return 0;
+  let total = 0;
+  conversationsForUser(currentUser.id).forEach(cid=>{
+    const count = messagesCache.filter(m=>m.conversationId===cid).length;
+    const seen = lastSeenMessageCount[cid] ?? count;
+    total += Math.max(0, count - seen);
+  });
+  return total;
+}
+
+function lastMessageIn(cid){
+  const msgs = messagesCache.filter(m=>m.conversationId===cid);
+  return msgs.length ? msgs[msgs.length-1] : null;
+}
+
+function renderMessages(){
+  if (!currentUser) return;
+  if (activeConversationId){
+    $("#msg-list-view").classList.add("hidden");
+    $("#msg-thread-view").classList.remove("hidden");
+    renderThread();
+  } else {
+    $("#msg-list-view").classList.remove("hidden");
+    $("#msg-thread-view").classList.add("hidden");
+    renderConversationList();
+  }
+}
+
+function renderConversationList(){
+  const wrap = $("#msg-conversation-list");
+  wrap.innerHTML = "";
+
+  const groupIds = GROUPS.filter(g=>g.members.includes(currentUser.id)).map(g=>g.id);
+  const dmIds = FAMILY.filter(f=>f.id!==currentUser.id).map(f=>dmId(currentUser.id,f.id));
+
+  const renderRow = (cid, icon, name)=>{
+    const last = lastMessageIn(cid);
+    const unread = Math.max(0, messagesCache.filter(m=>m.conversationId===cid).length - (lastSeenMessageCount[cid] ?? 0));
+    const row = document.createElement("div");
+    row.className = "conv-item";
+    const previewText = last ? (last.attachmentUrl ? (last.attachmentType==="image" ? "📷 Bild" : "📎 Datei") : escapeHtml(last.text)) : "Noch keine Nachrichten";
+    const timeText = last?.createdAtMs ? new Date(last.createdAtMs).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"}) : "";
+    row.innerHTML = `
+      <div class="conv-avatar">${icon}</div>
+      <div class="conv-info">
+        <div class="name">${escapeHtml(name)}</div>
+        <div class="preview">${previewText}</div>
+      </div>
+      <div class="conv-meta">
+        <div class="time">${timeText}</div>
+        ${unread ? `<span class="badge" style="margin-top:4px; display:inline-block;">${unread}</span>` : ""}
+      </div>
+    `;
+    row.addEventListener("click", ()=> openConversation(cid));
+    wrap.appendChild(row);
+  };
+
+  const groupLabel = document.createElement("div");
+  groupLabel.className = "conv-group-label";
+  groupLabel.textContent = "Gruppen";
+  wrap.appendChild(groupLabel);
+  groupIds.forEach(gid=>{
+    const g = GROUPS.find(x=>x.id===gid);
+    renderRow(gid, g.icon, g.name);
+  });
+
+  const dmLabel = document.createElement("div");
+  dmLabel.className = "conv-group-label";
+  dmLabel.textContent = "Einzelpersonen";
+  wrap.appendChild(dmLabel);
+  dmIds.forEach(cid=>{
+    const otherId = cid.slice(3).split("_").find(id=>id!==currentUser.id);
+    const other = FAMILY.find(f=>f.id===otherId);
+    renderRow(cid, other.initials, other.name);
+  });
+}
+
+function openConversation(cid){
+  activeConversationId = cid;
+  lastSeenMessageCount[cid] = messagesCache.filter(m=>m.conversationId===cid).length;
+  clearPendingAttachment();
+  renderMessages();
+}
+
+$("#msg-back").addEventListener("click", ()=>{
+  activeConversationId = null;
+  renderMessages();
+  renderNavDropdown();
+});
+
+const QUICK_REACTIONS = ["👍","❤️","😂","😮","😢"];
+
+function renderThread(){
+  const wrap = $("#chat-messages");
+  $("#msg-thread-title").textContent = conversationLabel(activeConversationId, currentUser.id);
+  const msgs = messagesCache.filter(m=>m.conversationId===activeConversationId);
+  wrap.innerHTML = msgs.length ? "" : `<div class="empty-state">Noch keine Nachrichten — schreib die erste!</div>`;
+  msgs.forEach(m=>{
+    const div = document.createElement("div");
+    const mine = m.sender===currentUser.id;
+    div.className = "chat-bubble" + (mine ? " mine" : "");
+    const senderName = usersCache[m.sender]?.name || m.sender;
+    const time = m.createdAtMs ? new Date(m.createdAtMs).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}) : "";
+    let attachHtml = "";
+    if (m.attachmentUrl){
+      if (m.attachmentType === "image"){
+        attachHtml = `<img src="${m.attachmentUrl}" class="attachment-bubble-img" data-open-img="${m.id}" />`;
+      } else {
+        attachHtml = `<a href="${m.attachmentUrl}" download="${escapeHtml(m.attachmentName||'datei')}" class="attachment-file-chip"><span class="ico">📎</span><span>${escapeHtml(m.attachmentName||"Datei")}</span></a>`;
+      }
+    }
+    const reactions = m.reactions || {};
+    const reactionChips = Object.entries(reactions)
+      .filter(([,ids])=> ids && ids.length)
+      .map(([emoji,ids])=>{
+        const mineReacted = ids.includes(currentUser.id);
+        return `<button class="reaction-chip${mineReacted?" mine":""}" data-toggle-reaction="${m.id}:${emoji}">${emoji} ${ids.length}</button>`;
+      }).join("");
+    const pickerBtns = QUICK_REACTIONS.map(e=>`<button data-toggle-reaction="${m.id}:${e}">${e}</button>`).join("");
+    div.innerHTML = `
+      <div class="sender">${escapeHtml(senderName)}</div>
+      ${attachHtml}
+      ${m.text ? `<div>${escapeHtml(m.text)}</div>` : ""}
+      <div class="time">${time}</div>
+      <div class="msg-actions">
+        <div class="reaction-row">${reactionChips}</div>
+        <div class="reaction-picker">
+          <button class="react-toggle" data-react-open="${m.id}">😊</button>
+          <div class="reaction-popover hidden" data-react-popover="${m.id}">${pickerBtns}</div>
+        </div>
+        ${mine ? `<button class="x-btn" data-del-msg="${m.id}" title="Löschen">&#10005;</button>` : ""}
+      </div>
+    `;
+    wrap.appendChild(div);
+  });
+
+  wrap.querySelectorAll("[data-open-img]").forEach(img=>{
+    img.addEventListener("click", ()=>{
+      const m = messagesCache.find(x=>x.id===img.dataset.openImg);
+      if (m) window.open(m.attachmentUrl, "_blank");
+    });
+  });
+  wrap.querySelectorAll("[data-react-open]").forEach(btn=>{
+    btn.addEventListener("click", (ev)=>{
+      ev.stopPropagation();
+      const pop = wrap.querySelector(`[data-react-popover="${btn.dataset.reactOpen}"]`);
+      wrap.querySelectorAll(".reaction-popover").forEach(p=> { if (p!==pop) p.classList.add("hidden"); });
+      pop.classList.toggle("hidden");
+    });
+  });
+  wrap.querySelectorAll("[data-toggle-reaction]").forEach(btn=>{
+    btn.addEventListener("click", async (ev)=>{
+      ev.stopPropagation();
+      const [msgId, emoji] = btn.dataset.toggleReaction.split(":");
+      await toggleReaction(msgId, emoji);
+      wrap.querySelectorAll(".reaction-popover").forEach(p=> p.classList.add("hidden"));
+    });
+  });
+  wrap.querySelectorAll("[data-del-msg]").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      if (!confirm("Nachricht löschen?")) return;
+      await deleteDoc(doc(db,"messages",btn.dataset.delMsg));
+    });
+  });
+
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+async function toggleReaction(msgId, emoji){
+  const m = messagesCache.find(x=>x.id===msgId);
+  if (!m) return;
+  const reactions = { ...(m.reactions||{}) };
+  const current = new Set(reactions[emoji] || []);
+  if (current.has(currentUser.id)) current.delete(currentUser.id);
+  else current.add(currentUser.id);
+  reactions[emoji] = Array.from(current);
+  await updateDoc(doc(db,"messages",msgId), { reactions });
+}
+
+document.addEventListener("click", ()=>{
+  $$(".reaction-popover").forEach(p=> p.classList.add("hidden"));
+});
+
+function clearPendingAttachment(){
+  pendingAttachment = null;
+  $("#attach-input").value = "";
+  $("#attachment-preview").classList.add("hidden");
+  $("#attachment-preview").innerHTML = "";
+}
+
+$("#attach-btn")?.addEventListener("click", ()=> $("#attach-input").click());
+$("#attach-input")?.addEventListener("change", async (e)=>{
+  const file = e.target.files[0];
+  if (!file) return;
+  const prev = $("#attachment-preview");
+  prev.classList.remove("hidden");
+  prev.innerHTML = `<div class="info">Wird vorbereitet …</div>`;
+  const prepared = await prepareAttachment(file);
+  if (!prepared){
+    clearPendingAttachment();
+    return;
+  }
+  pendingAttachment = prepared;
+  prev.innerHTML = prepared.type === "image"
+    ? `<img src="${prepared.dataUrl}" /><div class="info">${escapeHtml(prepared.name)}</div><button class="remove-att" id="remove-att">&#10005;</button>`
+    : `<span style="font-size:1.4rem;">📎</span><div class="info">${escapeHtml(prepared.name)}</div><button class="remove-att" id="remove-att">&#10005;</button>`;
+  $("#remove-att").addEventListener("click", clearPendingAttachment);
+});
+
+async function sendChatMessage(){
+  const input = $("#chat-input");
+  const text = input.value.trim();
+  if (!currentUser || !activeConversationId) return;
+  if (!text && !pendingAttachment) return;
+
+  const btn = $("#chat-send");
+  btn.disabled = true;
+  const originalLabel = btn.textContent;
+  try {
+    let attachmentUrl = null, attachmentType = null, attachmentName = null;
+    if (pendingAttachment){
+      attachmentUrl = pendingAttachment.dataUrl;
+      attachmentType = pendingAttachment.type;
+      attachmentName = pendingAttachment.name;
+    }
+    await addDoc(collection(db,"messages"), {
+      conversationId: activeConversationId,
+      sender: currentUser.id,
+      text,
+      attachmentUrl, attachmentType, attachmentName,
+      reactions: {},
+      createdAt: serverTimestamp(), createdAtMs: Date.now()
+    });
+    input.value = "";
+    clearPendingAttachment();
+
+    const recipients = conversationMembers(activeConversationId).filter(id=>id!==currentUser.id);
+    const preview = attachmentUrl ? (attachmentType==="image" ? "📷 Bild" : "📎 Datei") : text;
+    sendPush(recipients, `${currentUser.name} · ${conversationLabel(activeConversationId, currentUser.id)}`, preview);
+  } catch(err){
+    console.error(err);
+    toast("Senden fehlgeschlagen.");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+  }
+}
+$("#chat-send")?.addEventListener("click", sendChatMessage);
+$("#chat-input")?.addEventListener("keydown", e=>{ if (e.key==="Enter") sendChatMessage(); });
+
+// =========================================================
+// PUSH — goes through push-proxy-worker.js on Cloudflare (free, no card),
+// which holds the secret OneSignal REST API Key server-side and forwards
+// to OneSignal. Nothing here ever sees or sends that key.
+// =========================================================
+async function sendPush(externalIds, title, body){
+  if (!PUSH_PROXY_URL || !externalIds || !externalIds.length) return;
+  try {
+    await fetch(PUSH_PROXY_URL, {
+      method: "POST",
+      headers: { "Content-Type":"application/json", "X-Proxy-Secret": PUSH_PROXY_SECRET },
+      body: JSON.stringify({ appId: ONESIGNAL_APP_ID, externalIds, title, body })
+    });
+  } catch(e){ console.warn("Push senden fehlgeschlagen:", e); }
+}
+
+// sendAfterIso: ISO8601 UTC timestamp — OneSignal itself holds and fires it
+// later, so this works even if every device (and this proxy) is offline by
+// then. No cron job / always-on server needed.
+async function schedulePush(externalIds, title, body, sendAfterIso){
+  if (!PUSH_PROXY_URL || !externalIds || !externalIds.length) return;
+  try {
+    await fetch(PUSH_PROXY_URL, {
+      method: "POST",
+      headers: { "Content-Type":"application/json", "X-Proxy-Secret": PUSH_PROXY_SECRET },
+      body: JSON.stringify({ appId: ONESIGNAL_APP_ID, externalIds, title, body, sendAfter: sendAfterIso })
+    });
+  } catch(e){ console.warn("Erinnerung planen fehlgeschlagen:", e); }
+}
+
+function dedupe(arr){ return Array.from(new Set(arr)); }
+
+// =========================================================
+// NOTIFICATIONS
+// =========================================================
+async function requestNotificationPermission(){
+  if (!("Notification" in window)) return;
+  if (Notification.permission === "default"){
+    try { await Notification.requestPermission(); } catch(e){}
+  }
+  notificationsEnabled = Notification.permission === "granted";
+}
+
+function notifyUser(title, body){
+  if (notificationsEnabled && document.visibilityState !== "visible"){
+    try { new Notification(title, { body, icon:"icon-192.png" }); } catch(e){}
+  } else {
+    toast(body);
+  }
+}
+
+// =========================================================
+// ONESIGNAL — links this browser's push subscription to the
+// logged-in family member, so pushes can later be targeted at
+// them by name (e.g. "Nachricht an Jakob senden" → only Jakob's
+// devices ring). Sending itself still needs to be triggered from
+// OneSignal's dashboard, or later from a small server-side
+// function — see the setup notes for details.
+// =========================================================
+function linkOneSignalIdentity(userId){
+  if (!window.OneSignalDeferred) return;
+  window.OneSignalDeferred.push(async function(OneSignal){
+    try {
+      // IMPORTANT: OneSignal.login() alone only tags a device — it does
+      // NOT create an actual push subscription. Without this explicit
+      // request, no push ever arrives once the site is closed, even if
+      // the browser's own (separate) Notification permission was granted.
+      if (!OneSignal.Notifications.permission){
+        await OneSignal.Notifications.requestPermission();
+      }
+      await OneSignal.login(userId);                 // ties this device to e.g. "jakob"
+      await OneSignal.User.addTag("family_member", userId);
+      await OneSignal.User.addTag("role", currentUser?.role || "");
+    } catch(e){ console.warn("OneSignal linking skipped:", e); }
+  });
+}
+
+function checkListChangesForNotification(newLists){
+  if (!currentUser) return;
+  if (lastSeenLists === null){
+    lastSeenLists = {};
+    newLists.forEach(l=> lastSeenLists[l.id] = JSON.stringify(l));
+    return; // don't notify on first load
+  }
+  newLists.filter(canSee).forEach(l=>{
+    const snapshot = JSON.stringify(l);
+    const prev = lastSeenLists[l.id];
+    if (prev !== undefined && prev !== snapshot){
+      notifyUser("Liste aktualisiert", `„${l.name}“ wurde geändert.`);
+    }
+    lastSeenLists[l.id] = snapshot;
+  });
+}
+
+// =========================================================
+// MOOD
+// =========================================================
+function moodMeta(v){
+  if (v<=2) return { emoji:"⛈️", label:"Stürmisch" };
+  if (v<=4) return { emoji:"🌥️", label:"Bewölkt" };
+  if (v<=6) return { emoji:"⛅", label:"Ausgeglichen" };
+  if (v<=8) return { emoji:"🌤️", label:"Heiter" };
+  return { emoji:"☀️", label:"Strahlend" };
+}
+
+let parentBondCache = { mamaMood: 5, papaMood: 5 };
+
+function subscribeParentBond(){
+  // Only kids subscribe to this at all — it's not meant for either parent to see.
+  onSnapshot(doc(db,"meta","parentBond"), snap=>{
+    parentBondCache = snap.exists() ? snap.data() : { mamaMood:5, papaMood:5 };
+    if (currentUser && !currentUser.isParent) renderMood();
+  });
+}
+
+function renderMood(){
+  if (!currentUser) return;
+  const wrap = $("#mood-wrap");
+  const heading = $("#mood-heading");
+  if (!wrap || !heading) return;
+  wrap.innerHTML = "";
+
+  if (currentUser.id === "susanne"){
+    // Mama can only set Papa's mood. She does not see her own.
+    heading.textContent = "Papas Stimmung";
+    const papa = usersCache["matthias"];
+    const val = papa?.mood ?? 5;
+    const meta = moodMeta(val);
+    const card = document.createElement("div");
+    card.className = "mood-gauge";
+    card.innerHTML = `
+      <div class="who">Papas Stimmung</div>
+      <div class="mood-emoji">${meta.emoji}</div>
+      <div class="mood-label">${meta.label}</div>
+      <input type="range" min="0" max="10" value="${val}" id="mood-slider" />
+      <div class="mood-scale-lbls"><span>Anstrengender Tag</span><span>Wunderbar</span></div>
+    `;
+    wrap.appendChild(card);
+    card.querySelector("#mood-slider").addEventListener("input", async (e)=>{
+      const v = +e.target.value;
+      const m = moodMeta(v);
+      card.querySelector(".mood-emoji").textContent = m.emoji;
+      card.querySelector(".mood-label").textContent = m.label;
+      await updateDoc(doc(db,"users","matthias"), { mood: v });
+    });
+  } else if (!currentUser.isParent){
+    // Kids get two separate sliders — one for Mama, one for Papa. Neither parent sees this.
+    heading.textContent = "Wie sind Mama & Papa heute drauf?";
+
+    const makeSlider = (key, label, notifyLabel)=>{
+      const val = parentBondCache?.[key] ?? 5;
+      const meta = moodMeta(val);
+      const card = document.createElement("div");
+      card.className = "mood-gauge";
+      card.innerHTML = `
+        <div class="who">${label}</div>
+        <div class="mood-emoji">${meta.emoji}</div>
+        <div class="mood-label">${meta.label}</div>
+        <input type="range" min="0" max="10" value="${val}" id="${key}-slider" />
+        <div class="mood-scale-lbls"><span>Anstrengender Tag</span><span>Wunderbar</span></div>
+      `;
+      wrap.appendChild(card);
+      card.querySelector(`#${key}-slider`).addEventListener("input", async (e)=>{
+        const v = +e.target.value;
+        const m = moodMeta(v);
+        card.querySelector(".mood-emoji").textContent = m.emoji;
+        card.querySelector(".mood-label").textContent = m.label;
+        await setDoc(doc(db,"meta","parentBond"), { [key]: v, setBy: currentUser.id, updatedAt: serverTimestamp() }, { merge:true });
+        // Only the *other* kids get notified — this stays hidden from both parents by design.
+        const otherKids = FAMILY.filter(f=>!f.isParent && f.id!==currentUser.id).map(f=>f.id);
+        sendPush(otherKids, "Stimmungsbarometer", `${currentUser.name} hat ${notifyLabel} aktualisiert.`);
+      });
+    };
+
+    makeSlider("mamaMood", "Mamas Stimmung", "Mamas Stimmung");
+    makeSlider("papaMood", "Papas Stimmung", "Papas Stimmung");
+  }
+  // Papa: this panel/tab does not exist for him at all — nothing to render.
+}
+
+// =========================================================
+// SETTINGS
+// =========================================================
+function renderSettings(){
+  if (!currentUser) return;
+  const sw = $("#swatch-row");
+  sw.innerHTML = "";
+  ACCENTS.forEach(color=>{
+    const s = document.createElement("div");
+    s.className = "swatch" + (currentUser.accent===color ? " active" : "");
+    s.style.background = color;
+    s.addEventListener("click", async ()=>{
+      applyAccent(color);
+      currentUser.accent = color;
+      await updateDoc(doc(db,"users",currentUser.id), { accent: color });
+      renderSettings();
+    });
+    sw.appendChild(s);
+  });
+
+  const modeSwitch = $("#mode-switch");
+  modeSwitch.classList.toggle("on", !!currentUser.darkMode);
+  modeSwitch.onclick = async ()=>{
+    const dark = !currentUser.darkMode;
+    currentUser.darkMode = dark;
+    document.documentElement.setAttribute("data-theme", dark ? "dark":"light");
+    await updateDoc(doc(db,"users",currentUser.id), { darkMode: dark });
+    renderSettings();
+  };
+}
+
+$("#pw-change-btn").addEventListener("click", async ()=>{
+  const cur = $("#cur-pw").value, n1 = $("#new-pw").value, n2 = $("#new-pw2").value;
+  const err = $("#pw-change-error");
+  err.textContent = "";
+  if (cur !== currentUser.password){ err.textContent = "Aktuelles Passwort ist falsch."; return; }
+  if (n1.length < 4){ err.textContent = "Neues Passwort muss mindestens 4 Zeichen haben."; return; }
+  if (n1 !== n2){ err.textContent = "Neue Passwörter stimmen nicht überein."; return; }
+  await updateDoc(doc(db,"users",currentUser.id), { password: n1 });
+  currentUser.password = n1;
+  $("#cur-pw").value = ""; $("#new-pw").value = ""; $("#new-pw2").value = "";
+  toast("Passwort aktualisiert.");
+});
+
+// =========================================================
+// WEATHER (Home) — uses device location, no API key needed
+// =========================================================
+const WMO_ICON = {
+  0:"☀️",1:"🌤️",2:"⛅",3:"☁️",45:"🌫️",48:"🌫️",
+  51:"🌦️",53:"🌦️",55:"🌦️",61:"🌧️",63:"🌧️",65:"🌧️",
+  71:"🌨️",73:"🌨️",75:"❄️",80:"🌦️",81:"🌧️",82:"⛈️",
+  95:"⛈️",96:"⛈️",99:"⛈️"
+};
+function weatherIcon(code){ return WMO_ICON[code] || "🌡️"; }
+
+async function loadWeather(){
+  const wrap = $("#home-weather");
+  if (!wrap) return;
+  if (!("geolocation" in navigator)){
+    wrap.innerHTML = `<div class="empty-state" style="width:100%;">Standort wird von diesem Gerät nicht unterstützt.</div>`;
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(async (pos)=>{
+    const { latitude, longitude } = pos.coords;
+    try {
+      const [weatherRes, placeRes] = await Promise.all([
+        fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`),
+        fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=de`).catch(()=>null)
+      ]);
+      const weather = await weatherRes.json();
+      const place = placeRes ? await placeRes.json().catch(()=>null) : null;
+      const placeName = place ? (place.city || place.locality || place.principalSubdivision || "") : "";
+
+      const cur = weather.current;
+      const daily = weather.daily;
+      const todayIcon = weatherIcon(cur.weather_code);
+
+      let forecastHtml = "";
+      if (daily && daily.time){
+        forecastHtml = `<div class="weather-forecast">` + daily.time.slice(0,4).map((d,i)=>{
+          const label = i===0 ? "Heute" : new Date(d+"T00:00:00").toLocaleDateString("de-DE",{weekday:"short"});
+          return `<div class="day">
+            <div>${label}</div>
+            <div style="font-size:1.2rem;">${weatherIcon(daily.weather_code[i])}</div>
+            <div>${Math.round(daily.temperature_2m_max[i])}° / ${Math.round(daily.temperature_2m_min[i])}°</div>
+          </div>`;
+        }).join("") + `</div>`;
+      }
+
+      wrap.innerHTML = `
+        <div class="icon">${todayIcon}</div>
+        <div>
+          <div class="temp">${Math.round(cur.temperature_2m)}°C</div>
+          <div class="place">${escapeHtml(placeName)}</div>
+        </div>
+        ${forecastHtml}
+      `;
+    } catch(err){
+      wrap.innerHTML = `<div class="empty-state" style="width:100%;">Wetter konnte nicht geladen werden.</div>`;
+    }
+  }, ()=>{
+    wrap.innerHTML = `<div class="empty-state" style="width:100%;">Standortzugriff wurde nicht erlaubt.</div>`;
+  });
+}
+
+// ---------- PWA: register service worker (enables "Add to Home Screen") ----------
+if ("serviceWorker" in navigator){
+  window.addEventListener("load", ()=>{
+    navigator.serviceWorker.register("sw.js").catch(()=>{ /* fine if hosting env blocks it */ });
+  });
+}
+
+// ---------- boot ----------
+authReady
+  .then(ensureSeeded)
+  .then(tryAutoLogin)
+  .then((loggedIn)=>{ if (!loggedIn) buildCrestGrid(); })
+  .catch(()=>{
+    buildCrestGrid();
+    toast("Warte auf Verbindung zur Datenbank …");
+  });
+</script>
+</body>
+</html>
