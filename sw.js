@@ -1,9 +1,12 @@
 // OneSignal needs its worker code present in the SW that's registered for push.
 // Since this file is already registered (for offline caching), we import
 // OneSignal's worker script into it rather than registering a second worker.
-importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDKWorker.js");
+importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 
-const CACHE = "familien-hub-v1";
+// Bumped so browsers with an old, stuck service worker are forced to fetch
+// this new byte-different file and replace it (old cache name is deleted
+// automatically in "activate" below).
+const CACHE = "familien-hub-v2";
 const SHELL = ["./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (event) => {
